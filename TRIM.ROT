@@ -1,0 +1,18 @@
+Function Trim(S : Str80) : Str80;
+Var
+  I   : Integer;
+begin
+  If Length(S) > 0 then
+     begin
+       I := Length(S) + 1;
+       Repeat
+         I := I - 1;
+         If S[I] = ' ' then Delete(S,I,1);
+       Until (S[I] <> ' ') or (I = 0);
+       Trim := S;
+     end
+     else Trim := '';
+end;
+
+
+

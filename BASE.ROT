@@ -1,0 +1,22 @@
+Procedure CalculoBase(Prodt : Str6;
+                      Campo : Str80);
+Var
+   Car     : String[1];
+   I,M     : Integer;
+   Letras  : String[52];
+
+   begin
+     Letras := 'QmViLrEwNpTfIuGkPbKoSzFsUhBxZeMaJlHqOjXyWgYcAvCnDtRd';
+     I      := 1;
+     NBaseC := 0;
+     Campo  := Campo + Prodt;
+     M      := Length(Campo);
+     Repeat
+       Car    := Copy(Campo,I, 1);
+       NBaseC := NBaseC + Pos(Car,Letras);
+       I      := I + 1;
+     Until I = M + 1;
+   end;
+
+
+

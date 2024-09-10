@@ -1,0 +1,80 @@
+Procedure ConfigCRT;
+Var
+  Y,OrigMode     : Integer;
+  TabP           : Array [1..4]    of Str36;
+  TabPP          : Array [1..4]    of Integer;
+
+begin
+  TabPP[1] := 12;
+  TabPP[2] := 13;
+  TabPP[3] := 14;
+  TabPP[4] := 15;
+
+  TabP[1]  := ' Preto & Branco em Monitor Colorido ';
+  TabP[2]  := ' Colorido                           ';
+  TabP[3]  := ' Monocrom tico (Preto & Branco)     ';
+  TabP[4]  := ' Volta a configura‡„o Original      ';
+
+  Y        := 12;
+  For I := 1 to 4 do begin
+                       If TabPP[I] = Y then Color(Bfn,Btx)
+                                       else Color(Tfn,Ttx);
+                       GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                     end;
+  Color(Tfn,Ttx);
+
+  OrigMode := LastMode;
+
+  Repeat
+    Resp := ReadKey;
+    If (Resp = #0 ) and
+       (KeyPressed) then
+       begin
+         Resp := ReadKey;
+         Case Resp of
+              #72 : begin
+                      Y := Y - 1;
+                      If Y < 12 then Y := 15;
+                      For I := 1 to 4 do
+                      begin
+                        If TabPP[I] = Y then Color(Bfn,Btx)
+                                        else Color(Tfn,Ttx);
+                        GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                      end;
+                      Color(Tfn,Ttx);
+                    end;
+              #80 : begin
+                      Y := Y + 1;
+                      If Y > 15 then Y := 12;
+                      For I := 1 to 4 do
+                      begin
+                        If TabPP[I] = Y then Color(Bfn,Btx)
+                                        else Color(Tfn,Ttx);
+                        GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                      end;
+                      Color(Tfn,Ttx);
+                    end;
+         end;
+       end
+       else If Resp = #13 then
+               begin
+                 Case Y of
+                      12 : TextMode(2);
+                      13 : TextMode(3);
+                      14 : TextMode(7);
+                      15 : TextMode(OrigMode);
+                 end;
+
+                 DirectVideo := True;
+                 CheckSnow   := True;
+                 Resp        := #27;
+               end
+               else Resp := #00;
+  Until Resp = #27;
+
+  TC   := #13;
+  Resp := #13;
+
+  SetCursor(0);
+end;
+

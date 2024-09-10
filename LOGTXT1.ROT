@@ -1,0 +1,358 @@
+
+
+   Function  Substitui(X : AnyStr) : AnyStr;
+   Procedure SelectTxt(Diretorio : Str40; Sufixo : Str3);
+   Procedure PrintText(Suf : Str3);
+   Procedure PrintBackGround(X : Str3);
+
+Var
+   TxtFile               : TEXT;
+   TxtPath               : Str80;
+
+Implementation
+
+Type
+  PointerI = ^STreeI;
+
+  STreeI    = RECORD
+		ChaveI         : Str20;
+                LeftI,RightI   : PointerI;
+                WeightI        : Integer;
+              END;
+
+
+Var
+   DirInfo        : SearchRec;
+   RootI          : PointerI;
+   InNo           : Str20;
+   ScArrayI       : Array[1..4000] of Char;
+
+
+Procedure LoadTreeI ( Var RootI : PointerI );
+begin
+  If RootI = NIL then
+     begin
+       New ( RootI );
+       RootI^.ChaveI := InNo;
+       RootI^.LeftI  := NIL;
+       RootI^.RightI := NIL;
+     end
+     else If InNo < RootI^.ChaveI then LoadTreeI ( RootI^.LeftI  )
+                                  else LoadTreeI ( RootI^.RightI );
+end;
+
+
+Procedure SearchAntI ( Var RootI : PointerI );
+begin
+  If RootI <> NIL then
+     begin
+       If (RootI^.RightI <> NIL          ) and
+          (InNo           > RootI^.ChaveI) then SearchAntI ( RootI^.RightI );
+       If (RC   = 'N'          ) and
+          (InNo > RootI^.ChaveI) then
+          begin
+            RC   := 'S';
+            InNo := RootI^.ChaveI;
+          end
+          else If RC = 'N' then If RootI^.LeftI  <> NIL
+                                   then SearchAntI ( RootI^.LeftI  );
+     end;
+end;
+
+
+Procedure SearchPosI ( Var RootI : PointerI );
+begin
+  If RootI <> NIL then
+     begin
+       If (RootI^.LeftI  <> NIL          ) and
+          (InNo          <  RootI^.ChaveI) then SearchPosI ( RootI^.LeftI );
+       If (RC   = 'N'          ) and
+          (InNo < RootI^.ChaveI) then
+          begin
+            RC   := 'S';
+            InNo := RootI^.ChaveI;
+          end
+          else If RC = 'N' then If RootI^.RightI <> NIL
+                                   then SearchPosI ( RootI^.RightI );
+     end;
+end;
+
+
+Procedure DisposeI ( Var RootI : PointerI );
+begin
+  If RootI <> NIL then
+     begin
+       If RootI^.LeftI  <> NIL then DisposeI ( RootI^.LeftI  );
+       If RootI^.RightI <> NIL then DisposeI ( RootI^.RightI );
+       Dispose(RootI);
+     end;
+end;
+
+
+Procedure LoadDir;
+begin
+  InNo := DirInfo.Name;
+  LoadTreeI ( RootI );
+end;
+
+
+Procedure CarregaDir(Diretorio : Str40; Sufixo : Str5);
+begin
+  {$I-}
+  ChDir ( Diretorio );
+  {$I+}
+  If IOResult = 0 then
+     begin
+       FindFirst(('*.' + Sufixo),Archive,DirInfo);
+       If DosError = 0 then
+          begin
+            LoadDir;
+            Repeat
+              FindNext(DirInfo);
+              If DosError = 0 then LoadDir;
+            Until DosError = 18;
+          end;
+     end
+     else InNo := '';
+end;
+
+
+Procedure ScrollDir(Diretorio : Str40);
+Var
+   Cont,Direcao,
+   F,Tkb          : Char;
+   Sx,N,R,Ld      : Integer;
+   KArray         : Array[1..7]    of Str20;
+
+begin
+  Move(MemW[$B800:0000],ScArrayI[1],4000);
+  Color(Blue,White);
+  GotoXY(01,23); Write(ConstStr(' ',80));
+  GotoXY(04,23); Write(#25);
+  GotoXY(06,23); Write('PgDn');
+  GotoXY(25,23); Write(#24);
+  GotoXY(27,23); Write('PgUp');
+  GotoXY(47,23); Write('Esc');
+  GotoXY(61,23); Write('Enter');
+  Color(Blue,Cyan);
+  GotoXY(05,23); Write('/');
+  GotoXY(11,23); Write(#26,' Pr¢xima');
+  GotoXY(26,23); Write('/');
+  GotoXY(32,23); Write(#26,' Anterior');
+  GotoXY(51,23); Write(#26,' Fim');
+  GotoXY(67,23); Write(#26,' Imprime');
+  LimpaLn(24,Red);
+  Ld := Length(Diretorio);
+  If Ld < 12 then Ld := 12;
+  DrawBox(34,11,35+Ld,20,Sfn,'S');
+  Color(Red,White);
+  GotoXY(34,11); Write(ConstStr(' ',Ld+2));
+  GotoXY(35,11); Write(Diretorio);
+  Color(Sfn,Stx);
+  Tkb     := 'L';
+  F       := 'N';
+  Direcao := 'P';
+  L       := 0;
+  Sx      := 1;
+  For I := 1 to 7 do KArray[I] := '';
+  InNo := '';
+  Repeat
+    RC := 'N';
+    SearchPosI ( RootI );
+    If RC = 'S' then
+       begin
+         L := L + 1;
+         KArray[L] := InNo;
+       end
+       else L := 7;
+  Until L = 7;
+  Repeat
+    Window(34,13,36+Ld,20);
+    For I := 1 to 7 do begin
+                         If KArray[I] <> '' then
+                            begin
+                              If I = Sx then Color(Tfn,Utx)
+                                        else Color(Sfn,Stx);
+                              GotoXY(1,I); Writeln(' ',Pushleft(Ld+1,KArray[I]));
+                            end;
+                       end;
+
+    Window(1,1,80,25);
+    Cont := ReadKey;
+    If (Cont = #0 ) and
+       (KeyPressed) then
+       begin
+         Cont := ReadKey;
+         Case Cont of
+              #72 : begin
+                      Tkb     := 'L';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(27,23); Write('PgUp');
+                      Color(Blue,(White + Blink));
+                      GotoXY(25,23); Write(#24);
+                    end;
+              #73 : begin
+                      Tkb     := 'P';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(25,23); Write(#24);
+                      Color(Blue,(White + Blink));
+                      GotoXY(27,23); Write('PgUp');
+                    end;
+              #80 : begin
+                      Tkb     := 'L';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(04,23); Write(#25);
+                      Color(Blue,White);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(25,23); Write(#24);
+                      GotoXY(27,23); Write('PgUp');
+                    end;
+              #81 : begin
+                      Tkb     := 'P';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(06,23); Write('PgDn');
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(25,23); Write(#24);
+                      GotoXY(27,23); Write('PgUp');
+                    end;
+              else Direcao := ' ';
+         end;
+       end
+       else Direcao := 'N';
+    LimpaLn(24,Red);
+    N := 7;
+    Case Direcao of
+         'A' : If F <> 'A' then
+                  begin
+                    Case Tkb of
+                         'L' : If Sx > 1
+                                  then begin
+                                         Sx := Sx - 1;
+                                         F  := 'N';
+                                       end
+                                  else begin
+                                         RC   := 'N';
+                                         InNo := KArray[1];
+                                         SearchAntI ( RootI );
+                                         If RC = 'S' then
+                                            begin
+                                              For I := 7 downto 2
+                                              do KArray[I] := KArray[I - 1];
+                                              KArray[1] := InNo;
+                                              F         := 'N';
+                                            end
+                                            else F := 'A';
+                                       end;
+                         'P' : begin
+                                 N  := 0;
+                                 Sx := 1;
+                                 Repeat
+                                   N    := N + 1;
+                                   RC   := 'N';
+                                   InNo := KArray[1];
+                                   SearchAntI ( RootI );
+                                   If RC = 'S' then
+                                      begin
+                                        For I := 7 downto 2
+                                        do KArray[I] := KArray[I - 1];
+                                        KArray[1] := InNo;
+                                        F         := 'N';
+                                      end
+                                      else F := 'A';
+                                 Until (N = 7) or (RC = 'N');
+                               end;
+                    end;
+                  end;
+         'P' : If F <> 'P' then
+                  begin
+                    Case Tkb of
+                         'L' : If Sx < 7 then
+                                  begin
+                                    If KArray[Sx + 1] <> '' then
+                                       begin
+                                         Sx := Sx + 1;
+                                         F  := 'N';
+                                       end
+                                       else F := 'P';
+                                  end
+                                  else begin
+                                         RC   := 'N';
+                                         InNo := KArray[Sx];
+                                         SearchPosI ( RootI );
+                                         If RC = 'S' then
+                                            begin
+                                              For I := 2 to 7
+                                              do KArray[I - 1] := KArray[I];
+                                              KArray[7] := InNo;
+                                              F         := 'N';
+                                            end
+                                            else F := 'P';
+                                       end;
+                         'P' : begin
+                                 N  := 0;
+                                 Sx := 1;
+                                 Repeat
+                                   N := N + 1;
+                                   R := 7;
+                                   For L := 1 to 7
+                                   do If KArray[L] <> '' then R := L;
+                                   RC   := 'N';
+                                   InNo := KArray[R];
+                                   SearchPosI ( RootI );
+                                   If RC = 'S' then
+                                      begin
+                                        For I := 2 to 7
+                                        do KArray[I - 1] := KArray[I];
+                                        KArray[R] := InNo;
+                                      end;
+                                 Until (N = 7) or (RC = 'N');
+                                 F := 'N';
+                               end;
+                    end;
+                  end;
+    end;
+    If ((F <> 'N') or (N < 7)) and (Cont in [#72,#73,#80,#81]) then
+       begin
+         Color(Red,White);
+         GotoXY(1,24);  Write(ConstStr(' ',80));
+         GotoXY(2,24);  Write('Chegou ao final.');
+         Color(Sfn,Stx);
+       end;
+  Until Cont in [#13,#27];
+  If Cont = #13 then InNo := KArray[Sx]
+                else InNo := '';
+  Move(ScArrayI[1],MemW[$B800:0000],4000);
+  Color(Tfn,Utx);
+  TC := Cont;
+end;
+
+
+Procedure SelectTxt(Diretorio : Str40; Sufixo : Str3);
+begin
+  RootI := NIL;
+  CarregaDir(Diretorio,Sufixo);
+  If RootI <> NIL then
+     begin
+       ScrollDir(Diretorio);
+       If InNo <> '' then
+          begin
+            If Copy(Diretorio,Length(Diretorio),1) = '\'
+               then TxtPath := Diretorio + InNo
+               else TxtPath := Diretorio + '\' + InNo;
+          end
+          else TxtPath := '';
+     end
+     else TxtPath := '';
+  If RootI <> NIL then DisposeI ( RootI );
+  RootI := NIL;
+end;
+

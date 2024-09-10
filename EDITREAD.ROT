@@ -1,0 +1,13 @@
+Function EditReaD (V : Double) : Str80;
+var
+   S : string[80];
+   begin
+     V := Abs(V);
+     Str(V:0:2,S);
+     S[Length(S) - 2] := ',';
+     If Length(S) > 6  then Insert('.',S,(Length(S) -  5));
+     If Length(S) > 10 then Insert('.',S,(Length(S) -  9));
+     If Length(S) > 14 then Insert('.',S,(Length(S) - 13));
+     EditReaD := S;
+   end;
+

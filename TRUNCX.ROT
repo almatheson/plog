@@ -1,0 +1,14 @@
+Function TruncX (V : Real) : Real;
+Var
+   S : string[80];
+   E : Integer;
+   R : Real;
+begin
+  V := V * 100;
+  Str(V:15:0,S);
+  S := LeftAdjust(S);
+  Val(S,R,E);
+  TruncX := R / 100;
+end;
+
+

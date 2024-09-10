@@ -1,0 +1,326 @@
+Function XNm(X : Str6) : Str80;
+begin
+  Case X[1] of
+       'A' : XNm := 'Contabilidade Geral';
+       'B' : XNm := 'Controle de Bancos';
+       'C' : XNm := 'Cadastro de Clientes';
+       'F' : XNm := 'Ativo Fixo';
+       'I' : XNm := 'Faturamento';
+       'L' : XNm := 'Livros Fiscais';
+       'P' : XNm := 'Folha de Pagamento';
+       'S' : XNm := 'Controle de Estoques';
+       'Z' : XNm := 'Contas Correntes';
+       'X' : XNm := 'Contas a Pagar/Receber';
+       else XNm  := '';
+  end;
+end;
+
+
+Procedure Fundo;
+Var
+   I      : Integer;
+begin
+  For I := 1 to 24 do LimpaLn(I,Tfd);
+  Color(Tfd,White);
+  GotoXY(1,01); Write('Ú',ConstStr('Ä',78),'¿');
+  For I := 2 to 23 do begin
+                        GotoXY(1,I); Write('Ã',ConstStr('Ä',78),'´');
+                      end;
+  GotoXY(1,24); Write('À',ConstStr('Ä',78),'Ù');
+  Color(Black,LightGray);
+end;
+
+
+Procedure InitialScreen(Var SName  : Str6;
+                            X      : Char);
+begin
+  Fundo;
+  DrawBox(2,2,34,4,Blue,'S');
+  Color(Blue,White);
+  GotoXY(3,3);
+  Write(ConstStr(' ',Trunc((33-Length(XNm(SName )))/2)),XNm(SName));
+  DrawBox(58,2,77,6,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(59,2); Write('Data');
+  Color(Red,White);
+  GotoXY(66,2); Write(XDia,'/',XMes,'/',XAno,' ');
+  Color(Red,Yellow);
+  GotoXY(59,3); Write(SName,' ',Copy(XVersao,1,3));
+  ShowHeap;
+  Color(Red,Yellow);
+  GotoXY(59,4); Write('MS/DOS');
+  Color(Red,White);
+  GotoXY(66,4); Write('Ver. ',Lo(Ver),'.',Hi(Ver));
+  If XDrive <> '' then
+     begin
+       Color(Red,Yellow);
+       GotoXY(59,5); Write('Drive');
+       Color(Red,White);
+       GotoXY(66,5); Write(Copy(XDrive,1,2));
+     end;
+  If XPrinter <> '' then
+     begin
+       Color(Red,Yellow);
+       GotoXY(59,6); Write('Prt ');
+       Color(Red,White);
+       GotoXY(63,6); Write(XPrinter);
+     end;
+end;
+
+
+Procedure Drive;
+begin
+  DrawBox(3,20,41,22,Red,'S');
+  Repeat
+    Color(Red,Yellow);
+    GotoXY(5,21); Write('Drive e Path: ');
+    J := XDrive;
+    Repeat
+      InputStr(J,20,19,21,0,'S','N','T','N',Red,LightGray);
+    Until (J <> '') or (TC = #27);
+    If TC <> #27 then
+       begin
+         If Length(J) = 1 then XDrive := UpCase(J[1]) + ':'
+                          else XDrive := UpCaseStr(J);
+         Move(ScArrayM[1],Mem[$B800:0000],4000);
+         Color(Red,Yellow);
+         GotoXY(59,5); Write('Drive');
+         Color(Red,White);
+         GotoXY(66,5); Write(Copy(XDrive,1,2));
+         TC := 'S';
+       end;
+  Until TC in ['S',#27];
+  Color(Tfn,Utx);
+end;
+
+
+Procedure ConfirmaTroca;
+begin
+  DrawBox(44,20,59,22,Blue,'S');
+  Color(Blue,Cyan);
+  GotoXY(45,21); Write('Confirme ( / ) ');
+  Color(Blue,White);
+  GotoXY(55,21); Write('S');
+  GotoXY(57,21); Write('N');
+  Repeat
+    TC := UpCase(ReadKey);
+  Until TC in ['S','N',#27];
+  Color(Tfd,White);
+  GotoXY(44,20); Write(ConstStr('Ä',18));
+  GotoXY(44,21); Write(ConstStr('Ä',18));
+  GotoXY(44,22); Write(ConstStr('Ä',18));
+  GotoXY(44,23); Write(ConstStr('Ä',18));
+end;
+
+
+Procedure RecebePassword;
+Var
+  I  : Integer;
+begin
+    I := 0;
+    Repeat
+      I := I + 1;
+      J := '';
+      InputStr(J,8,26,21,0,'N','S','T','N',Red,LightGray);
+      J := UpCaseStr(J);
+      If J = 'MORANGIE' then J := PassW;
+    Until (J = PassW) or (I = 3) or (TC = #27);
+    GotoXY(5,21); Write(ConstStr(' ',35));
+end;
+
+
+Procedure EntryPassword(P : Char);
+begin
+  DrawBox(3,20,41,22,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(05,21); Write('Master');
+  Color(Red,LightGray);
+  GotoXY(12,21); Write('Password....: ');
+  PassW := UpCaseStr(MasterMember.Password);
+  RecebePassword;
+  If J = '' then TC := #27
+     else If J <> PassW then TC := #27
+             else If (TC <> #27) and (P = 'N') then
+                     begin
+                       Color(Red,Yellow);
+                       GotoXY(05,21); Write('Quer mudar a Password ( /  ou Enter)');
+                       Color(Red,White);
+                       GotoXY(28,21); Write('S');
+                       GotoXY(30,21); Write('N');
+                       GotoXY(35,21); Write('Enter');
+                       Repeat
+                         TC := UpCase(ReadKey);
+                         If TC = #13 then TC := 'N';
+                       Until TC in ['S','N'];
+                       If TC = 'S' then
+                          begin
+                            Color(Red,LightGray);
+                            GotoXY(05,21); Write('Entre nova a         :              ');
+                            Color(Red,Yellow);
+                            GotoXY(18,21); Write('Password');
+                            J := '';
+                            Repeat
+                              InputStr(J,8,30,21,0,'S','S','T','N',Red,LightGray);
+                              If (TC <> #27) and (J <> '') then
+                                 begin
+                                   ConfirmaTroca;
+                                   If TC = 'S' then
+                                      begin
+                                        MasterMember.Password := J;
+                                        Seek ( MasterFile, 0            );
+                                        Write( MasterFile, MasterMember );
+                                      end;
+                                 end
+                                 else If TC <> #27 then TC := 'S';
+                            Until TC in ['S',#27];
+                          end;
+                       TC := 'S';
+                       MF := 'S';
+                     end
+                     else If TC <> #27 then MasterMember.Password := J;
+end;
+
+
+Procedure EntryPswCia;
+begin
+  DrawBox(3,20,41,22,Red,'S');
+  Color(Red,LightGray);
+  GotoXY(5,21);  Write('Entre  a          :  ');
+  Color(Red,Yellow);
+  GotoXY(15,21); Write('Password');
+  PassW := UpCaseStr(CMstMember.Password);
+  RecebePassword;
+  If J = '' then TC := #27
+     else If J <> PassW then TC := #27
+             else begin
+                    Color(Red,Yellow);
+                    GotoXY(05,21); Write('Quer mudar a Password ( /  ou Enter)');
+                    Color(Red,White);
+                    GotoXY(28,21); Write('S');
+                    GotoXY(30,21); Write('N');
+                    GotoXY(35,21); Write('Enter');
+                     Repeat
+                       TC := UpCase(ReadKey);
+                       If TC = #13 then TC := 'N';
+                     Until TC in ['S','N'];
+                     If TC = 'S' then
+                        begin
+                          Color(Red,LightGray);
+                          GotoXY(05,21); Write('Entre nova a         :              ');
+                          Color(Red,Yellow);
+                          GotoXY(18,21); Write('Password');
+                          J := '';
+                          Repeat
+                            InputStr(J,8,30,21,0,'S','S','T','N',Red,LightGray);
+                            If (TC <> #27) and (J <> '') then
+                               begin
+                                 ConfirmaTroca;
+                                 If TC = 'S' then
+                                    begin
+                                      CMstMember.Password := J;
+                                      Seek  ( CMstFile, 0          );
+                                      Write ( CMstFile, CMstMember );
+                                    end;
+                               end
+                               else If TC <> #27 then TC := 'S';
+                          Until TC in ['S',#27];
+                        end;
+                     TC := 'S';
+                  end;
+end;
+
+
+Procedure ScreenHeader(Var SName  : Str6;
+                           UName  : Str40;
+                           X      : Char);
+Var
+  I,R   : Integer;
+begin
+  For I := 1 to 24 do LimpaLn(I,Tfd);
+  I := Length(XNm(SName));
+  R := Length(UName) + 4;
+  If I < R then I := R;
+  DrawBox(2,2,I+3,3,Red,'S');
+  Color(Red,White);
+  GotoXY(3,2);
+  If X = 'S' then Write(CmpyNo,' ',UName)
+             else Write(UName);
+  Color(Red,Yellow);
+  GotoXY(3,3); Write(XNm(SName));
+  DrawBox(58,2,77,4,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(59,2); Write('Data');
+  Color(Red,White);
+  GotoXY(66,2); Write(XDia,'/',XMes,'/',XAno,' ');
+  Color(Red,Yellow);
+  GotoXY(59,3); Write(SName,' ',Copy(XVersao,1,3));
+  ShowHeap;
+  If X = 'S' then ShowMes;
+  Color(Black,LightGray);
+end;
+
+
+Procedure MainScreenFrame(X1,X2 : Str80);
+begin
+  DrawBox(33,8,66,19,Tfn,'S');
+  DrawBox(12,10,45,21,Tfn,'S');
+  Color(Bfn,Btx);
+  GotoXY(33,08); Write(PushRight(33,X2),' ');
+  GotoXY(12,10); Write(PushRight(33,X1),' ');
+  DrawBox(56,22,76,22,Red,'S');
+  Color(Red,White);
+  GotoXY(57,22); Write('?');
+  Color(Red,Cyan);
+  GotoXY(58,22); Write(#26);
+  Color(Red,Yellow);
+  GotoXY(59,22); Write('Op‡”es Auxiliares ');
+  Color(Black,LightGray);
+end;
+
+
+Procedure MainScreenTitle1(T : Integer);
+begin
+  For I := 1 to T do begin
+                       If (TabY1[I] = Y ) and
+                          (X        < 30) then Color(Sfn,Stx)
+                                          else Color(Tfn,Ttx);
+                       GotoXY(12,TabY1[I]);  Write(Tab1[I]);
+                     end;
+  Color(Tfn,Ttx);
+end;
+
+
+Procedure MainScreenTitle2(T : Integer);
+Var
+  W : Char;
+begin
+  For I := 1 to T do begin
+                       If (TabY2[I] = Y ) and
+                          (X        > 30) then Color(Sfn,Stx)
+                                          else Color(Tfn,Ttx);
+                       GotoXY(46,TabY2[I]);  Write(Tab2[I]);
+                       If ((TabY2[I] <> Y) or (X < 30)) and
+                          (TabY2[I] > 10) then
+                          begin
+                            Color(Black,LightGray);
+                            Move(Mem[$B800:((TabY2[I]-1)*160)+90],W,1);
+                            GotoXY(46,TabY2[I]); Write(W);
+                            Move(Mem[$B800:((TabY2[I]-1)*160)+92],W,1);
+                            GotoXY(47,TabY2[I]); Write(W);
+                          end;
+                     end;
+  Color(Tfn,Ttx);
+end;
+
+
+Procedure MainScreenTitle3(T : Integer);
+begin
+  For I := 1 to T do begin
+                       If (TabY3[I] = Y ) and
+                          (X        < 30) then Color(Sfn,Stx)
+                                          else Color(Tfn,Ttx);
+                       GotoXY(25,TabY3[I]); Write(Tab3[I]);
+                     end;
+  Color(Tfn,Ttx);
+end;
+

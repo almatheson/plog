@@ -1,0 +1,56 @@
+Procedure MainScreenFrame(X1,X2,X3 : Str80);
+begin
+  DrawBox(34,8,67,19,Tfn,'S');
+  DrawBox(12,9,47,22,Tfn,'S');
+  Color(Bfn,Btx);
+  GotoXY(03,06); Write(' ',PushLeft((Length(X1) + 1),X1));
+  GotoXY(34,08); Write(PushRight(44,X3));
+  GotoXY(12,09); Write(PushRight(44,X2));
+  Color(Black,LightGray);
+end;
+
+
+Procedure MainScreenTitle1(T : Integer);
+begin
+  For I := 1 to T do begin
+                       If (TabY1[I] = Y ) and
+                          (X        < 30) then Color(Bfn,Btx)
+                                          else Color(Tfn,Ttx);
+                       GotoXY(12,TabY1[I]);  Write(Tab1[I]);
+                     end;
+  Color(Tfn,Ttx);
+end;
+
+
+Procedure MainScreenTitle2(T : Integer);
+Var
+  W : Char;
+begin
+  For I := 1 to T do begin
+                       If (TabY2[I] = Y ) and
+                          (X        > 30) then Color(Bfn,Btx)
+                                          else Color(Tfn,Ttx);
+
+                       GotoXY(47,TabY2[I]);  Write(Tab2[I]);
+                       Color(Black,LightGray);
+                       Move(Mem[$B800:((TabY2[I]-1)*160)+94],W,1);
+                       GotoXY(47,TabY2[I]); Write(W);
+                       Move(Mem[$B800:((TabY2[I]-1)*160)+96],W,1);
+                       GotoXY(48,TabY2[I]); Write(W);
+                     end;
+  Color(Tfn,Ttx);
+end;
+
+
+Procedure MainScreenTitle3(T : Integer);
+begin
+  For I := 1 to T do begin
+                       If (TabY3[I] = Y ) and
+                          (X        < 30) then Color(Bfn,Btx)
+                                          else Color(Tfn,Ttx);
+                       GotoXY(29,TabY3[I]); Write(Tab3[I]);
+                     end;
+  Color(Tfn,Ttx);
+end;
+
+

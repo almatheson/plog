@@ -1,0 +1,44 @@
+Procedure CheckUF( Uf : Str2);
+
+Var
+   I          : Integer;
+   UfArray    : Array[1..29] of String[2];
+
+   begin
+     UfArray[01] := 'AM';
+     UfArray[02] := 'AC';
+     UfArray[03] := 'AL';
+     UfArray[04] := 'AP';
+     UfArray[05] := 'BA';
+     UfArray[06] := 'CE';
+     UfArray[07] := 'DF';
+     UfArray[08] := 'ES';
+     UfArray[09] := 'EX';
+     UfArray[10] := 'FN';
+     UfArray[11] := 'GO';
+     UfArray[12] := 'MA';
+     UfArray[13] := 'MG';
+     UfArray[14] := 'MS';
+     UfArray[15] := 'MT';
+     UfArray[16] := 'PA';
+     UfArray[17] := 'PB';
+     UfArray[18] := 'PE';
+     UfArray[19] := 'PI';
+     UfArray[20] := 'PR';
+     UfArray[21] := 'RJ';
+     UfArray[22] := 'RN';
+     UfArray[23] := 'RO';
+     UfArray[24] := 'RR';
+     UfArray[25] := 'RS';
+     UfArray[26] := 'SC';
+     UfArray[27] := 'SE';
+     UfArray[28] := 'SP';
+     UfArray[29] := 'TO';
+     I           := 0;
+     R           := 1;
+     Repeat
+       I := I + 1;
+     Until (I = 29) or (Uf = UfArray[I]);
+     If Uf = UfArray[I] then R := 0;
+   end;
+

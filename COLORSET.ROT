@@ -1,0 +1,244 @@
+Procedure ColorSetUp;
+begin
+  Color(Tfn,Yellow);
+  GotoXY(3,10);
+  Write('                    Fundo      Texto');
+  Color(MasterMember.TfdO,Black);
+  GotoXY(3,12); Write(' Painel de Fundo  ');
+  Color(MasterMember.BfnO,MasterMember.BtxO);
+  GotoXY(3,14); Write(' Titulos de telas ');
+  Color(MasterMember.TfnO,MasterMember.TtxO);
+  GotoXY(3,16); Write(' Tela Principal   ');
+  Color(MasterMember.SfnO,MasterMember.StxO);
+  GotoXY(3,18); Write(' Janelas          ');
+  Color(MasterMember.TfnO,MasterMember.UtxO);
+  GotoXY(3,20); Write(' Texto do Usu rio ');
+  Color(Tfn,Utx);
+  GotoXY(25,12); Write(MasterMember.TfdO:2);
+  GotoXY(25,14); Write(MasterMember.BfnO:2);
+  GotoXY(36,14); Write(MasterMember.BtxO:2);
+  GotoXY(25,16); Write(MasterMember.TfnO:2);
+  GotoXY(36,16); Write(MasterMember.TtxO:2);
+  GotoXY(25,18); Write(MasterMember.SfnO:2);
+  GotoXY(36,18); Write(MasterMember.StxO:2);
+  GotoXY(36,20); Write(MasterMember.UtxO:2);
+  DrawBox(50,5,72,20,Red,'S');
+  Color(Red,White);
+  For I := 0 to 15 do begin
+                        GotoXY(51,(I + 5)); Write(I:2,#26);
+                      end;
+  Color(Black,Black);
+  GotoXY(54,05); Write('   ');
+  Color(Red,Black);
+  GotoXY(58,05); Write('Preto');
+  Color(Blue,Blue);
+  GotoXY(54,06); Write('   ');
+  Color(Red,Blue);
+  GotoXY(58,06); Write('Azul');
+  Color(Green,Green);
+  GotoXY(54,07); Write('   ');
+  Color(Red,Green);
+  GotoXY(58,07); Write('Verde');
+  Color(Cyan,Cyan);
+  GotoXY(54,08); Write('   ');
+  Color(Red,Cyan);
+  GotoXY(58,08); Write('Cyan');
+  Color(Red,Red);
+  GotoXY(54,09); Write('   ');
+  Color(Red,LightGray);
+  GotoXY(58,09); Write('Vermelho');
+  Color(Magenta,Magenta);
+  GotoXY(54,10); Write('   ');
+  Color(Red,Magenta);
+  GotoXY(58,10); Write('Magenta');
+  Color(Brown,Brown);
+  GotoXY(54,11); Write('   ');
+  Color(Red,Brown);
+  GotoXY(58,11); Write('Marrom');
+  Color(LightGray,LightGray);
+  GotoXY(54,12); Write('   ');
+  Color(Red,LightGray);
+  GotoXY(58,12); Write('Cinza Claro');
+  Color(DarkGray,DarkGray);
+  GotoXY(54,13); Write('   ');
+  Color(Red,DarkGray);
+  GotoXY(58,13); Write('Cinza Escuro');
+  Color(LightBlue,LightBlue);
+  GotoXY(54,14); Write('   ');
+  Color(Red,LightBlue);
+  GotoXY(58,14); Write('Azul Claro');
+  Color(LightGreen,LightGreen);
+  GotoXY(54,15); Write('   ');
+  Color(Red,LightGreen);
+  GotoXY(58,15); Write('Verde Claro');
+  Color(LightCyan,LightCyan);
+  GotoXY(54,16); Write('   ');
+  Color(Red,LightCyan);
+  GotoXY(58,16); Write('Cyan Claro');
+  Color(LightRed,LightRed);
+  GotoXY(54,17); Write('   ');
+  Color(Red,LightRed);
+  GotoXY(58,17); Write('Vermelho Claro');
+  Color(LightMagenta,LightMagenta);
+  GotoXY(54,18); Write('   ');
+  Color(Red,LightMagenta);
+  GotoXY(58,18); Write('Magenta Claro');
+  Color(Yellow,Yellow);
+  GotoXY(54,19); Write('   ');
+  Color(Red,Yellow);
+  GotoXY(58,19); Write('Amarelo');
+  Color(White,White);
+  GotoXY(54,20); Write('   ');
+  Color(Red,White);
+  GotoXY(58,20); Write('Branco');
+  Repeat
+    K := 0;
+    Repeat
+      Case K of
+           0 : begin
+                 Str(MasterMember.TfdO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,25,12,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.TfdO,E);
+                 If MasterMember.TfdO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.TfdO,Black);
+                           GotoXY(3,12); Write(' Painel de Fundo  ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           1 : begin
+                 Str(MasterMember.BfnO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,25,14,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.BfnO,E);
+                 If MasterMember.BfnO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.BfnO,MasterMember.BtxO);
+                           GotoXY(3,14); Write(' Titulos de telas ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           2 : begin
+                 Str(MasterMember.BtxO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,36,14,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.BtxO,E);
+                 If MasterMember.BtxO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.BfnO,MasterMember.BtxO);
+                           GotoXY(3,14); Write(' Titulos de telas ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           3 : begin
+                 Str(MasterMember.TfnO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,25,16,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.TfnO,E);
+                 If MasterMember.TfnO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.TfnO,MasterMember.TtxO);
+                           GotoXY(3,16); Write(' Tela Principal   ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           4 : begin
+                 Str(MasterMember.TtxO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,36,16,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.TtxO,E);
+                 If MasterMember.TtxO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.TfnO,MasterMember.TtxO);
+                           GotoXY(3,16); Write(' Tela Principal   ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           5 : begin
+                 Str(MasterMember.SfnO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,25,18,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.SfnO,E);
+                 If MasterMember.SfnO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.SfnO,MasterMember.StxO);
+                           GotoXY(3,18); Write(' Janelas          ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           6 : begin
+                 Str(MasterMember.StxO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,36,18,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.StxO,E);
+                 If MasterMember.StxO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.SfnO,MasterMember.StxO);
+                           GotoXY(3,18); Write(' Janelas          ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+           7 : begin
+                 Str(MasterMember.UtxO:2,J);
+                 J := LeftAdjust(J);
+		 InputStr(J,2,36,20,0,'S','N','T','N',Tfn,Utx);
+                 Val(J,MasterMember.UtxO,E);
+                 If MasterMember.UtxO > 15 then
+                    begin
+                      ErroMsg := 'C“r Inv lida';
+                      ErrorMessage;
+                      K := K - 1;
+                    end
+                    else begin
+                           Color(MasterMember.TfnO,MasterMember.UtxO);
+                           GotoXY(3,20); Write(' Texto do Usu rio ');
+                           Color(Black,LightGray);
+                         end;
+               end;
+      end;
+      Case TC of
+           #13 : K := K + 1;
+           #24 : If K > 0 then K := K - 1;
+      end;
+    Until (TC = #27) or (K = 8);
+    If TC <> #27 then Confirma;
+  Until (TC = #27) or (TC = 'S');
+end;
+
+

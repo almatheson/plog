@@ -1,0 +1,18 @@
+Procedure ScreenFrame;
+Var
+  I : Integer;
+begin
+  Color(Tfd,LightGray);
+  GotoXY(1,6); ClrEol;
+  For I := 7 to 24 do begin
+                        GotoXY(1,I); ClrEol;
+                      end;
+  DrawBox(35,6,77,19,Red,'S');
+  Color(Bfn,Btx);
+  GotoXY(35,6); Write(' ',PushLeft(42,Titulo));
+  DrawBox(2,8,60,21,Tfn,'S');
+  Color(Tfn,Ttx);
+end;
+
+
+

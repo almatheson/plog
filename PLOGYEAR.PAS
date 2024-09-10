@@ -102,14 +102,14 @@ Var
   CpfR,
   Pis          : String[11];
   CGCAnt       : String[14];
+  UsoEmpresa2,
+  UsoEmpresa3,
+  UsoEmpresa1,
   Ad13s,
   Pg13s,
   Sal          : String[15];
   BairroR,
   Bairro       : String[19];
-  UsoEmpresa2,
-  UsoEmpresa3,
-  UsoEmpresa1,
   ComplR,
   Complemento,
   NMuniR,
@@ -520,12 +520,6 @@ begin
                                                                                             TruncX(YAddress^.AcMensalV);
                                                          end;
                                                     end;
-                                           'O' : If (CCMember.Bases[4] = 'S'  ) and
-                                                    (YYNo              = '004') then
-                                                    begin
-                                                      HPMember.Ad13_Valor := YAddress^.AcMensalV;
-                                                      HPMember.Ad13_Mes   := N;
-                                                    end;
                                            end;
                                            If (YYNo = '003') or (YYNo = 'R06')
                                               then HPMember.SalarioFaml[N] := HPMember.SalarioFaml[N] +
@@ -539,14 +533,14 @@ begin
                                                 HPMember.Pg13_ValorD := HPMember.Pg13_ValorD +
                                                                         TruncX(YAddress^.AcMensalV);
                                               end;
-                                           If YYNo = 'R02'
+                                           If (YYNo = 'R02') or (YYNo = 'R03')
                                               then HPMember.ContrSind := TruncX(YAddress^.AcMensalV);
                                            If (YYNo = '061') or (YYNo = 'R50')
                                               then HPMember.ValorInss[N] := HPMember.ValorInss[N] +
                                                                             TruncX(YAddress^.AcMensalV);
-                                        {   If (YYNo = '064') or (YYNo = 'R51')
+                                           If (YYNo = '064') or (YYNo = 'R51')
                                               then HPMember.Pg13_Inss := HPMember.Pg13_Inss +
-                                                                         TruncX(YAddress^.AcMensalV);   }
+                                                                         TruncX(YAddress^.AcMensalV);
 
                                            If (YYNo = '060') or (YYNo = 'R54')
                                               then HPMember.IRenda[N] := HPMember.IRenda[N] + TruncX(YAddress^.AcMensalV);

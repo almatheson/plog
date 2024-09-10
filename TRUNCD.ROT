@@ -1,0 +1,15 @@
+Function TruncX (V : Double) : Double;
+Var
+   S : string[80];
+   E : Integer;
+   R : Double;
+
+begin
+  V := V * 100;
+  Str(V:15:0,S);
+  S := LeftAdjust(S);
+  Val(S,R,E);
+  TruncX := R / 100;
+end;
+
+

@@ -1,0 +1,46 @@
+Procedure SetCursor( n : Integer );
+Var
+  Reg : Registers;
+
+begin
+  With Reg do
+  begin
+    Case Mch of
+         'X' : Case n of          { Para XT }
+                    0 : begin
+                          ch := 11; { Cursor Apagado    }
+                          cl := 00;
+                        end;
+                    1 : begin
+                          ch := 06; { Cursor Normal     }
+                          cl := 07;
+                        end;
+                    2 : begin
+                          ch := 00; { Cursor Dobrado    }
+                          cl := 07;
+                        end;
+               end;
+         'A' : Case n of          { Para AT }
+                    0 : begin
+                          ch := 12; { Cursor Apagado   }
+                          cl := 00;
+                        end;
+                    1 : begin
+                          ch := 11; { Cursor Normal    }
+                          cl := 12;
+                        end;
+                    2 : begin
+                          ch := 00; { Cursor Dobrado   }
+                          cl := 12;
+                        end;
+               end;
+    end;
+
+    ah := 1;
+    Intr ($10, Reg);
+  end;
+end;
+
+
+
+

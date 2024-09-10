@@ -1,0 +1,77 @@
+Procedure Confirma;
+Var
+   Ix   : Integer;
+begin
+  Color(Red,Cyan);
+  GotoXY(01,24); Write(ConstStr(' ',80));
+  GotoXY(02,24);
+  Write('Confirma a transa‡„o ?    Sim      N„o     ou    Abandona              Use');
+  Color(Red,Yellow);
+  GotoXY(37,24); Write('N');
+  GotoXY(51,24); Write('A');
+  GotoXY(77,24); Write(#27);
+  GotoXY(79,24); Write(#26);
+  Color(Blue,White);
+  GotoXY(27,24); Write(' Sim ');
+
+  Ix := 1;
+
+  Repeat
+    TC := UpCase(ReadKey);
+
+    Case TC of
+         'A' : TC := #27;
+         #00 : If KeyPressed then
+                  begin
+                    TC := UpCase(ReadKey);
+                    Case TC of
+                         #75 : If Ix = 1 then Ix := 3
+                                         else Ix := Ix - 1;
+                         #77 : If Ix = 3 then Ix := 1
+                                         else Ix := Ix + 1;
+                    end;
+
+                    If (TC = #75) or (TC = #77) then
+                       begin
+                         If Ix = 1 then Color(Blue,White)
+                                   else Color(Red,Cyan);
+                         GotoXY(27,24); Write(' Sim ');
+
+                         If Ix = 2 then Color(Blue,White)
+                                   else Color(Red,Cyan);
+                         GotoXY(36,24); Write(' N„o ');
+
+                         If Ix = 3 then Color(Blue,White)
+                                   else Color(Red,Cyan);
+                         GotoXY(50,24); Write(' Abandona ');
+
+                         Color(Red,Yellow);
+
+                         GotoXY(28,24);
+                         If Ix <> 1 then Write('S');
+
+                         GotoXY(37,24);
+                         If Ix <> 2 then Write('N');
+
+                         GotoXY(51,24);
+                         If Ix <> 3 then Write('A');
+                       end;
+                  end;
+    end;
+
+    If TC = #13 then
+       Case Ix of
+            1 : TC := 'S';
+            2 : TC := 'N';
+            3 : TC := #27;
+       end;
+
+  Until (TC = 'S') or (TC = 'N') or (TC = #27);
+
+  Color(Tfd,Utx);
+  GotoXY(1,24); ClrEol;
+  Color(Tfn,Utx);
+end;
+
+
+

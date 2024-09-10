@@ -1,0 +1,325 @@
+Procedure InputStr (Var S         : AnyStr;
+                        L,X,Y,P   : Integer;
+			B,H,C,E   : Char;
+			F,T       : Byte);
+Const
+    UnderScore = '_';
+    MaskD      = '__/__/____';
+    MaskR      = '___.___.___.___.___,__';
+    MaskN      = '__.___.___.___.___.___';
+Var
+   P1,P2,P3,P4 : Integer;
+   Ch,Mo,Ca,Di : Char;
+   S2          : AnyStr;
+begin
+   If S <> '' then
+      begin
+        If C in ['$','N'] then
+           begin
+             S2 := S;
+             Case C of
+                  '$' : S := Copy(MaskR,(22-L+1),L);
+                  'N' : S := Copy(MaskN,(22-L+1),L);
+             end;
+             P1 := L;
+             For P2 := Length(S2) Downto 1 do
+             begin
+               If Not (S2[P2] in ['.',',']) then
+                  begin
+                    If S[P1] in ['.',','] then P1 := P1 - 1;
+                    S[P1] := S2[P2];
+                    P1 := P1 - 1;
+                  end;
+             end;
+           end;
+      end
+      else Case C of
+                'D' : S := MaskD;
+                '$' : S := Copy(MaskR,(22-L+1),L);
+                'N' : S := Copy(MaskN,(22-L+1),L);
+           end;
+   Case C of
+        'D','T' : Di := 'E';
+        '$','N' : Di := 'D';
+   end;
+   SetCursor(1);
+   Color(F,T);
+   GotoXY(X,Y);
+   If B = 'S'
+      then If L > Length(S) then Write(S,ConstStr(UnderScore,L-Length(S)))
+                            else Write(S);
+   Ca := ' ';
+   Mo := 'O';
+   If Di = 'D' then P := L
+               else P := 0;
+   Repeat
+      Color(F,T);
+      GotoXY(X+P,Y);
+      Ch := ReadKey;
+      Case Ch of
+           #32..#126 : begin
+                         If ((P < L) and (Di = 'E')) or (Di = 'D') then
+                            begin
+                              Case C of
+                                   'T' : If Ch in [#34,#39,#94,#96,#126] then Ca := Ch
+                                            else begin
+                                                   Case Ca of
+                                                        #34 : Case Ch of
+                                                                   'u' : Ch := #129;
+                                                                   'U' : Ch := #154;
+                                                                   'a' : Ch := #132;
+                                                                   'A' : Ch := #142;
+                                                                   'e' : Ch := #137;
+                                                                   'i' : Ch := #139;
+                                                                   'o' : Ch := #148;
+                                                                   'O' : Ch := #153;
+                                                                   'Y' : Ch := #152;
+                                                                   else  Ch := Ca;
+                                                              end;
+                                                        #39 : Case Ch of
+                                                                   'a' : Ch := #160;
+                                                                   'A' : Ch := #143;
+                                                                   'e' : Ch := #130;
+                                                                   'E' : Ch := #144;
+                                                                   'i' : Ch := #161;
+                                                                   'o' : Ch := #162;
+                                                                   'u' : Ch := #163;
+                                                                   'c' : Ch := #135;
+                                                                   'C' : Ch := #128;
+                                                                   else  Ch := Ca;
+                                                              end;
+                                                        #94 : Case Ch of
+                                                                   'a' : Ch := #131;
+                                                                   'e' : Ch := #136;
+                                                                   'o' : Ch := #147;
+                                                                   else  Ch := Ca;
+                                                              end;
+                                                        #96 : Case Ch of
+                                                                   'a' : Ch := #133;
+                                                                   'e' : Ch := #138;
+                                                                   'i' : Ch := #141;
+                                                                   'o' : Ch := #149;
+                                                                   'u' : Ch := #151;
+                                                                   else  Ch := Ca;
+                                                               end;
+                                                        #126 : Case Ch of
+                                                                    'a' : Ch := #132;
+                                                                    'o' : Ch := #148;
+                                                                    'O' : Ch := #153;
+                                                                    else  Ch := Ca;
+                                                               end;
+                                                   end;
+                                                   P := P + 1;
+                                                   If Mo = 'O' then Delete(S,P,1)
+                                                      else If Length(S) = L
+                                                              then Delete(S,L,1);
+                                                   Insert (Ch,S,P);
+                                                   If B = 'S' then Write(Copy(S,P,L))
+                                                              else Write('*');
+                                                   Ca := ' ';
+                                                 end;
+                                   'D','$','N' : If ((Ch >= #48) and (Ch <= #57)) or
+                                                    ((Ch  = #45) and (C  <> 'D')) then
+                                                    begin
+                                                      Case Di of
+                                                           'E' : begin
+                                                                   If S[P+1] in ['/','.',','] then P := P + 2
+                                                                                              else P := P + 1;
+                                                                   If Mo = 'O' then Delete(S,P,1)
+                                                                      else If Length(S) = L
+                                                                              then Delete(S,L,1);
+                                                                   Insert (Ch,S,P);
+                                                                 end;
+                                                           'D' : begin
+                                                                   If P = L then P4 := P - 1
+                                                                            else P4 := P;
+                                                                   P1 := 0;
+                                                                   Repeat
+                                                                     P1 := P1 + 1;
+                                                                     If Not (S[P1] in ['/','.',',']) then
+                                                                        begin
+                                                                          P2 := P1;
+                                                                          If S[P1+1] in ['/','.',','] then P3 := P1 + 2
+                                                                                                      else P3 := P1 + 1;
+                                                                          S[P2] := S[P3];
+                                                                        end;
+                                                                   Until P1 >= P4;
+                                                                   If P = L then
+                                                                      begin
+                                                                        Delete(S,P,1);
+                                                                        Insert (Ch,S,P);
+                                                                      end
+                                                                      else begin
+                                                                             Delete(S,P+1,1);
+                                                                             Insert (Ch,S,P+1);
+                                                                           end;
+                                                                 end;
+                                                      end;
+                                                      GotoXY(X,Y);
+                                                      If B = 'S' then Write(S,ConstStr(UnderScore,L-Length(S)))
+                                                         else Write('*');
+                                                    end;
+                              end;
+                            end
+                            else Write (^G);
+                       end;
+           ^A        : If (P > 0) and (C = 'T') then
+                          begin
+                             Repeat
+                                P := P - 1;
+                             Until (S[P] = #32) or (P = 0);
+                             Ch := #00;
+                             Ca := ' ';
+                          end
+                          else Ch := #00;
+           ^F        : If (P < Length(S)) and (C = 'T') then
+                          begin
+                             Repeat
+                                P := P + 1;
+                             Until (S[P] = #32) or (P = Length(S));
+                             Ch := #00;
+                             Ca := ' ';
+                          end
+                          else Ch := #00;
+           ^H        : If (P > 0) and (C = 'T') then
+                          begin
+                            Delete (S,P,1);
+                            GotoXY(X,Y);
+                            If B = 'S' then Write(S,ConstStr(UnderScore,L-Length(S)));
+                            P  := P - 1;
+                            Ch := #00;
+                          end
+                          else Ch := #00;
+           ^Y        : If C = 'T' then
+                          begin
+                            S := '';
+                            GotoXY(X,Y);
+                            If B = 'S' then Write(S,ConstStr(UnderScore,L));
+                            P  := 0;
+                            Ch := #00;
+                          end
+                          else Ch := #00;
+           ^T        : If (P < Length(S)) and (C = 'T') then
+                          begin
+                             P1 := P;
+                             Repeat
+                                P1 := P1 + 1;
+                             Until (S[P1] = #32) or (P1 = Length(S));
+                             Delete (S,P + 1,P1 - P);
+                             GotoXY(X,Y);
+                             If B = 'S' then Write(S,ConstStr(UnderScore,L-Length(S)));
+                             Ch := #00;
+                          end
+                          else Ch := #00;
+           else If KeyPressed then
+                   begin
+                     Ch := ReadKey;
+                     Case Ch of
+                          #59 : Ch := #21;
+                          #60 : Ch := #22;
+                          #61 : Ch := #23;
+                          #71 : If C = 'T' then P := 0;
+                          #72 : Ch := #24;
+                          #75 : If P > 0 then
+                                   begin
+                                     If (S[P] in ['/','.',',']) and
+                                        (C    in ['D','$','N']) then P := P - 2
+                                                                else P := P - 1;
+                                   end;
+                          #77 : If P < Length(S) then
+                                   begin
+                                     If (S[P] in ['/','.',',']) and
+                                        (C    in ['D','$','N']) then P := P + 2
+                                                                else P := P + 1;
+                                   end;
+                          #79 : If C = 'T' then P := Length(S);
+                          #80 : Ch := #25;
+                          #82 : If C = 'T' then
+                                   Case Mo of
+                                        'I' : begin
+                                                Mo := 'O';
+                                                SetCursor(1);
+                                              end;
+                                        'O' : begin
+                                                Mo := 'I';
+                                                SetCursor(2);
+                                              end;
+                                end;
+                          #83 : If (P < Length(S)) and (C = 'T') then
+                                   begin
+                                     Delete (S,P+1,1);
+                                     If B = 'S'
+                                        then Write (Copy(S,P+1,L),UnderScore);
+                                   end
+                                   else If Di = 'D' then
+                                           begin
+                                             For P1 := P+1 downto 2
+                                             do If Not (S[P1] in ['/','.',','])
+                                                   then If Not (S[P1-1] in ['/','.',','])
+                                                           then S[P1] := S[P1-1]
+                                                           else If P1-2 > 0 then S[P1] := S[P1-2];
+                                             If Not (S[1] in ['/','.',',']) then S[1] := '_'
+                                                                            else S[2] := '_';
+                                             GotoXY(X,Y); Write(S);
+                                           end;
+                          #120 : Ch := #01;
+                          #121 : Ch := #02;
+                          #122 : Ch := #03;
+                          #123 : Ch := #04;
+                          #124 : Ch := #05;
+                          #125 : Ch := #06;
+                          #126 : Ch := #07;
+                          #127 : Ch := #08;
+                          #128 : Ch := #09;
+                          else   Ch := #00;
+                     end;
+                   end
+                   else If not (Ch in [#13,#27]) then Write (#7);
+      end;
+      If ((C = 'D') and (E = 'S') and (P = L)) or
+         ((C = 'D') and (Ch = #13)) then
+         begin
+           If ChkData(S) = '' then
+              begin
+                SetCursor(0);
+                ErroMsg := 'Data Invalida';
+                ErrorMessage;
+                SetCursor(1);
+                Ch := #00;
+              end
+              else Ch := #13;
+         end;
+   Until Ch in [#1,#2,#3,#4,#5,#6,#7,#8,#9,#13,#21,#22,#23,#24,#25,#27];
+   If C in ['$','N'] then
+      begin
+        If S[Length(S)-2] = ',' then
+           begin
+             If S[Length(S)] = '_'   then S[Length(S)]   := '0';
+             If S[Length(S)-1] = '_' then S[Length(S)-1] := '0';
+             If S[Length(S)-3] = ' ' then S[Length(S)-3] := '0';
+           end;
+        For P1 := 1 to Length(S) do If S[P1] = '_' then S[P1] := ' ';
+        For P1 := Length(S) downto 1 do
+        begin
+          If (S[P1] = '.') and (S[P1+1] = ' ') then S[P1] := ' ';
+          If (S[P1] = ' ') and (S[P1+1] = '.') then S[P1+1] := ' ';
+        end;
+        If S[Length(S)-3] = ' ' then S[Length(S)-3] := '0';
+        If S = ' ,00' then S := '0,00';
+        GotoXY(X,Y); Write(PushRight(L,S));
+        P1 := 1;
+        Repeat
+          If S[P1] = '.' then Delete(S,P1,1)
+                         else P1 := P1 + 1;
+        Until P1 >= Length(S);
+        For P1 := 1 to L do If S[P1] = ',' then S[P1] := '.';
+      end
+      else If B = 'S' then
+              begin
+                GotoXY(X,Y); Write(PushLeft(L,S));
+              end;
+   S := Trim(S);
+   TC := Ch;
+   SetCursor(0);
+end;
+

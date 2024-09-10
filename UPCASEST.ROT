@@ -1,0 +1,10 @@
+Function UpCaseStr (S : Str80) : Str80;
+var
+   P : Integer;
+begin
+  For P := 1 to Length(S) Do S[P] := Upcase(S[P]);
+  UpCaseStr := S;
+end;
+
+
+

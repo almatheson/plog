@@ -1,0 +1,11 @@
+Function RightAdjust (T : Integer;S : Str80) : Str80;
+begin
+  If Length(S) < T then
+     Repeat
+       Insert(' ',S,1);
+     Until Length(S) = T;
+  RightAdjust := S;
+end;
+
+
+

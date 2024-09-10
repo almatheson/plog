@@ -1,0 +1,214 @@
+Procedure ConfigPrinter;
+begin
+  Color(Tfn,Utx);
+  TabI[1]  := ' EPSON (compat¡veis)    ';
+  TabI[2]  := ' HP LaserJet            ';
+  TabI[3]  := ' HP DeskJet             ';
+  TabI[4]  := ' Em¡lia PC              ';
+  TabI[5]  := ' Am‚lia PC              ';
+  TabI[6]  := ' Rima                   ';
+  TabI[7]  := ' Configurar Manualmente ';
+  TabI[8]  := ' Encerrar a fun‡„o      ';
+  TabX[1]  := 6;
+  TabX[2]  := 6;
+  TabX[3]  := 6;
+  TabX[4]  := 6;
+  TabX[5]  := 6;
+  TabX[6]  := 6;
+  TabX[7]  := 6;
+  TabX[8]  := 6;
+  TabY[1]  := 11;
+  TabY[2]  := 12;
+  TabY[3]  := 13;
+  TabY[4]  := 14;
+  TabY[5]  := 15;
+  TabY[6]  := 16;
+  TabY[7]  := 17;
+  TabY[8]  := 18;
+  DrawBox(5,10,30,19,Sfn,'S');
+  YY := 1;
+  MenuAuxiliar(8,Tfn,Utx,Sfn,Stx);
+  Color(Red,White);
+  GotoXY(62,10); Write(PushLeft(16,MasterMember.TipoImpr));
+  Shade(3,8,60,21,LightGray,Black);
+  Color(Tfn,Ttx);
+  Repeat
+    Resp := ReadKey;
+    If (Resp = #0 ) and
+       (KeyPressed) then
+       begin
+         Resp := ReadKey;
+         Case Resp of
+              #72 : begin
+                      YY := YY - 1;
+                      If YY < 1 then YY := 8;
+                    end;
+              #80 : begin
+                      YY := YY + 1;
+                      If YY > 8 then YY := 1;
+                    end;
+         end;
+         MenuAuxiliar(8,Tfn,Utx,Sfn,Stx);
+       end
+       else If Resp = #13 then
+               begin
+                 Move(Mem[$B800:0000],ScArray4[1],4000);
+                 Case YY of
+                      1  : begin                           {EPSON         }
+                             MasterMember.Don      := #14;
+                             MasterMember.Dof      := #20;
+                             MasterMember.Con      := #15;
+                             MasterMember.Cof      := #18;
+                             MasterMember.Non      := #27+#71;
+                             MasterMember.Nof      := #27+#72;
+			     MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'N';
+                             MasterMember.TipoImpr := 'EPSON      ';
+                             TC                    := 'S';
+                           end;
+                      2  : begin                           {HP LaserJet   }
+                             MasterMember.Don      := #27+'(s7H';
+                             MasterMember.Dof      := #27+'&k0S';
+                             MasterMember.Con      := #27+'(s17H';
+                             MasterMember.Cof      := #27+'&k0S';
+                             MasterMember.Non      := '';
+                             MasterMember.Nof      := '';
+			     MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'L';
+                             MasterMember.TipoImpr := 'HP LaserJet';
+                             TC                    := 'S';
+                           end;
+                      3  : begin                           {HP DeskJet    }
+                             MasterMember.Don      := #27+'(s7H';
+                             MasterMember.Dof      := #27+'&k0S';
+                             MasterMember.Con      := #27+'(s17H';
+                             MasterMember.Cof      := #27+'&k0S';
+                             MasterMember.Non      := '';
+                             MasterMember.Nof      := '';
+			     MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'D';
+                             MasterMember.TipoImpr := 'HP DeskJet ';
+                             TC                    := 'S';
+                           end;
+                      4  : begin                           {Em¡lia PC     }
+                             MasterMember.Don      := #14;
+                             MasterMember.Dof      := #20;
+                             MasterMember.Con      := #15;
+                             MasterMember.Cof      := #18;
+                             MasterMember.Non      := #27+#71;
+                             MasterMember.Nof      := #27+#72;
+                             MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'N';
+                             MasterMember.TipoImpr := 'Em¡lia PC  ';
+                             TC                    := 'S';
+                           end;
+                      5  : begin                           {Am‚lia PC     }
+                             MasterMember.Don      := #00;
+                             MasterMember.Dof      := #00;
+                             MasterMember.Con      := #15;
+                             MasterMember.Cof      := #18;
+                             MasterMember.Non      := #27+#71;
+                             MasterMember.Nof      := #27+#72;
+                             MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'N';
+                             MasterMember.TipoImpr := 'Am‚lia PC  ';
+                             TC                    := 'S';
+                           end;
+                      6  : begin                           {Rima          }
+                             MasterMember.Don      := #14;
+                             MasterMember.Dof      := #20;
+                             MasterMember.Con      := #15;
+                             MasterMember.Cof      := #18;
+                             MasterMember.Non      := #27+#71;
+                             MasterMember.Nof      := #27+#72;
+                             MasterMember.Qpa      := #12;
+			     MasterMember.LJet     := 'N';
+                             MasterMember.TipoImpr := 'Rima       ';
+                             TC                    := 'S';
+                           end;
+                      7  : begin                           {Config.Manual }
+                             MasterMember.Don      := ' ';
+                             MasterMember.Dof      := ' ';
+                             MasterMember.Con      := ' ';
+                             MasterMember.Cof      := ' ';
+                             MasterMember.Non      := ' ';
+                             MasterMember.Nof      := ' ';
+                             MasterMember.Qpa      := ' ';
+			     MasterMember.LJet     := 'N';
+                             MasterMember.TipoImpr := 'Conf.Manual';
+                             TC                    := 'S';
+                             DrawBox(33,15,56,19,Sfn,'S');
+                             Color(Sfn,Stx);
+                             GotoXY(44,15); Write(' Liga  Desl. ');
+                             GotoXY(34,16); Write('Expandido  ');
+                             GotoXY(34,17); Write('Comprimido ');
+                             GotoXY(34,18); Write('Dupla Impr.');
+                             GotoXY(34,19); Write('Quebra Pag.');
+                             Repeat
+                               K := 1;
+                               Repeat
+                                 Case K of
+                                      1 : begin
+                                            J := '';
+                                            InputStr(J,3,46,16,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Don := Chr(I);
+                                          end;
+                                      2 : begin
+                                            J := '';
+                                            InputStr(J,3,52,16,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Dof := Chr(I);
+                                          end;
+                                      3 : begin
+                                            J := '';
+                                            InputStr(J,3,46,17,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Con := Chr(I);
+                                          end;
+                                      4 : begin
+                                            J := '';
+                                            InputStr(J,3,52,17,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Cof := Chr(I);
+                                          end;
+                                      5 : begin
+                                            J := '';
+                                            InputStr(J,3,46,18,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Non := Chr(I);
+                                          end;
+                                      6 : begin
+                                            J := '';
+                                            InputStr(J,3,52,18,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Nof := Chr(I);
+                                          end;
+                                      7 : begin
+                                            J := '';
+                                            InputStr(J,3,46,19,0,'S','N','T','N',Sfn,Stx);
+                                            Val(J,I,E);
+                                            MasterMember.Qpa := Chr(I);
+                                          end;
+                                 end;
+                                 Case TC of
+                                      #13 : K := K + 1;
+                                      #24 : If K > 1 then K := K - 1;
+                                 end;
+                               Until (K = 8) or (TC = #27);
+                               If TC <> #27 then Confirma;
+                             Until TC in [#27,'S'];
+                           end;
+                      8  : Resp := #27;
+                 end;
+                 Move(ScArray4[1],Mem[$B800:0000],4000);
+                 If TC = 'S' then
+                    begin
+                      Color(Tfn,Ttx);
+                      GotoXY(38,20); Write(PushLeft(20,MasterMember.TipoImpr));
+                    end;
+               end
+               else Resp := #13;
+  Until Resp = #27;
+end;
+

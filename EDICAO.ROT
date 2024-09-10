@@ -1,0 +1,29 @@
+Procedure Edicao;
+begin
+  Color(Red,White);
+  GotoXY(61,8);  Write(' Ctrl S');
+  GotoXY(61,9);  Write(' Ctrl D');
+  GotoXY(61,10); Write(' Ctrl Q');
+  GotoXY(61,11); Write(' Ctrl Z');
+  GotoXY(61,12); Write(' Ctrl A');
+  GotoXY(61,13); Write(' Ctrl F');
+  GotoXY(61,14); Write(' Ctrl G');
+  GotoXY(61,15); Write(' ',#17,'---');
+  GotoXY(61,16); Write(' Ctrl T');
+  GotoXY(61,17); Write(' Ctrl Y');
+  GotoXY(61,18); Write(' F2');
+  Color(Red,Yellow);
+  GotoXY(69,8);  Write('= Cur. ',#27);
+  GotoXY(69,9);  Write('= Cur. ',#26);
+  GotoXY(69,10); Write('= Inicio');
+  GotoXY(69,11); Write('= Final');
+  GotoXY(69,12); Write('= ',#27,' Pal.');
+  GotoXY(69,13); Write('= ',#26,' Pal.');
+  GotoXY(69,14); Write('= Delete');
+  GotoXY(69,15); Write('= ',#27,' Del.');
+  GotoXY(69,16); Write('= Del.P.');
+  GotoXY(69,17); Write('= Del.L.');
+  GotoXY(69,18); Write('= Acentua');
+  Color(Tfn,Ttx);
+end;
+

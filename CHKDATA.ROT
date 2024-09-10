@@ -1,0 +1,62 @@
+Function ChkData(S : Str10): Str10;
+Var
+  B,I,E,D,M,A : Integer;
+  Dia         : Array[1..12] of Integer;
+  P,X         : Str10;
+
+begin
+  Dia[01] := 31;
+  Dia[02] := 28;
+  Dia[03] := 31;
+  Dia[04] := 30;
+  Dia[05] := 31;
+  Dia[06] := 30;
+  Dia[07] := 31;
+  Dia[08] := 31;
+  Dia[09] := 30;
+  Dia[10] := 31;
+  Dia[11] := 30;
+  Dia[12] := 31;
+  D := 0;
+  M := 0;
+  A := 0;
+  B := 1;
+  I := 0;
+  P := '';
+  Repeat
+    I := I + 1;
+    If (S[I] = '/') or (Length(P) = 4) then
+       begin
+         Case B of
+              1 : Val(P,D,E);
+              2 : Val(P,M,E);
+              3 : begin
+                    Val(P,A,E);
+                    I := 11;
+                  end;
+         end;
+         B := B + 1;
+         P := '';
+       end
+       else If S[I] in ['0','1','2','3','4','5','6','7','8','9'] then P := P + S[I];
+  Until B = 4;
+  E := A div 4;
+  If (A - (E * 4)) = 0 then Dia[2] := 29;
+  If (D = 0 ) or
+     (M = 0 ) or
+     (M > 12) or
+     (A < 0 ) then ChkData := ''
+              else If D > Dia[M] then ChkData := ''
+                                 else begin
+                                        Str(D,X);
+                                        If D < 10 then X := '0' + X;
+                                        P := X + '/';
+                                        Str(M,X);
+                                        If M < 10 then X := '0' + X;
+                                        P := P + X + '/';
+                                        Str(A,X);
+                                      {  If A < 10 then X := '0' + X; }
+                                        P := P + X;
+                                        ChkData := P;
+                                      end;
+end;

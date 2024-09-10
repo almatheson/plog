@@ -1,0 +1,20 @@
+Procedure BuildFrame(X : Char);
+begin
+  If VezD = 'N' then
+     begin
+       Move(ScArray3[1],MemW[$B800:0000],4000);
+       Color(Bfn,Btx);
+       GotoXY(36,6); Write(PushLeft(41,Titulo));
+       ShowHeap;
+     end
+     else begin
+            ShowHeap;
+            ScreenFrame;
+            If X = 'S' then ShowMes;
+            Move(MemW[$B800:0000],ScArray3[1],4000);
+            VezD := 'N';
+          end;
+end;
+
+
+

@@ -1,0 +1,11 @@
+Function EditNumber (V : Real) : Str80;
+var
+   S : string[80];
+begin
+  Str(V:5:0,S);
+  If V > 999  then Insert('.',S,(Length(S) -  2));
+  EditNumber := S;
+end;
+
+
+

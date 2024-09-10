@@ -1,0 +1,14 @@
+Procedure Footer;
+Var
+  I,P     : Integer;
+begin
+  If Foot = 'S' then
+     begin
+       If ContLin < 59 then
+          begin
+            I := ContLin + 1;
+            For P := I to 59 do WriteLine('L',' ');
+          end;
+       WriteLine('W',Nx+Acentua(XMarca)+Nf);
+     end;
+end;

@@ -1,0 +1,400 @@
+Procedure ScrollRpt;
+Type
+   Relat  = Record
+              Texto   : AnyStr;
+            end;
+Var
+   RpMember       : Relat;
+   RpFile         : FILE OF Relat;
+
+   Cont,Direcao,
+   F,Tkb          : Char;
+   L,Rg,R,N,Tam,
+   Cx,Fx          : Integer;
+   RArray         : Array[1..25] of Integer;
+   TArray         : Array[1..25] of AnyStr;
+   ScArrayX       : Array [1..4000] of Char;
+begin
+  Reset   ( LST );
+  Assign  ( RpFile, (XDrive + '\REPORT.DAT'));
+  {$I-}
+  ReWrite ( RpFile );
+  {$I+}
+  If IOResult = 0 then
+     begin
+       L := 0;
+       While not Eof(LST) do
+       begin
+         ReadLn(LST, RpMember.Texto);
+         If not Eof(LST) then
+            begin
+              L := L + 1;
+              Seek  ( RpFile, L        );
+              Write ( RpFile, RpMember );
+            end;
+       end;
+     end;
+  If L > 0 then
+     begin
+       Tam := FileSize(RpFile) - 1;
+       Move(MemW[$B800:0000],ScArrayX[1],4000);
+       Color(White,Black);
+       ClrScr;
+       For L := 1 to 25 do begin
+                             RArray[L] := 0;
+                             TArray[L] := '';
+                           end;
+       Tkb     := 'L';
+       F       := 'N';
+       Direcao := 'P';
+       Cx      := 1;
+       Fx      := 80;
+       L       := 0;
+       Rg      := -1;
+       Repeat
+         L := L  + 1;
+         Rg := Rg + 1;
+         Seek ( RpFile, Rg       );
+         Read ( RpFile, RpMember );
+         RArray[L] := Rg;
+         TArray[L] := RpMember.Texto;
+       Until (Rg = Tam) or (L = 25);
+       Window(1,1,80,25);
+       Repeat
+         For I := 1 to 25 do begin
+                               GotoXY(1,I);
+                               Write(PushLeft(80,Copy(TArray[I],Cx,Fx)));
+                             end;
+         Cont := ReadKey;
+         If (Cont = #0) and (KeyPressed) then
+            begin
+              Cont := ReadKey;
+              Case Cont of
+                   #72 : begin
+                           Tkb     := 'L';
+                           Direcao := 'A';
+                         end;
+                   #73 : begin
+                           Tkb     := 'P';
+                           Direcao := 'A';
+                         end;
+                   #75 : begin
+                           If Cx > 1 then
+                              begin
+                                Cx := Cx - 1;
+                                Fx := Fx - 1;
+                              end;
+                           Direcao := 'L';
+                         end;
+                   #77 : begin
+                           If Cx < 255 then
+                              begin
+                                Cx := Cx + 1;
+                                Fx := Fx + 1;
+                              end;
+                           Direcao := 'R';
+                         end;
+                   #80 : begin
+                           Tkb     := 'L';
+                           Direcao := 'P';
+                         end;
+                   #81 : begin
+                           Tkb     := 'P';
+                           Direcao := 'P';
+                         end;
+                   else Direcao := ' ';
+              end;
+            end
+            else Direcao := 'N';
+         Case Direcao of
+              'A' : If F <> 'A' then
+                       begin
+                         Case Tkb of
+                         'L' : If RArray[1] > 0 then
+                                  begin
+                                    Rg := RArray[1] - 1;
+                                    For L := 25 downto 2 do
+                                    begin
+                                      RArray[L] := RArray[L - 1];
+                                      TArray[L] := TArray[L - 1];
+                                    end;
+                                    Seek ( RpFile, Rg       );
+                                    Read ( RpFile, RpMember );
+                                    RArray[1] := Rg;
+                                    TArray[1] := RpMember.Texto;
+                                    F := 'N';
+                                  end
+                                  else F := 'A';
+                         'P' : begin
+                                 N := 0;
+                                 Repeat
+                                   If RArray[1] > 0 then
+                                      begin
+                                        Rg := RArray[1] - 1;
+                                        For L := 25 downto 2 do
+                                        begin
+                                          RArray[L] := RArray[L - 1];
+                                          TArray[L] := TArray[L - 1];
+                                        end;
+                                        Seek ( RpFile, Rg       );
+                                        Read ( RpFile, RpMember );
+                                        RArray[1] := Rg;
+                                        TArray[1] := RpMember.Texto;
+                                        N := N + 1;
+                                        F := 'N';
+                                      end
+                                      else F := 'A';
+                                 Until (N = 25) or (RArray[1] = 0);
+                               end;
+                         end;
+                       end;
+              'P' : If F <> 'P' then
+                       begin
+                         Case Tkb of
+                         'L' : begin
+                                 R := 25;
+                                 For L := 1 to 25
+                                 do If TArray[L] <> '' then R  := L;
+                                 If RArray[R] < Tam then
+                                    begin
+                                      Rg := RArray[R];
+                                      For L := 2 to 25 do
+                                      begin
+                                        RArray[L - 1] := RArray[L];
+                                        TArray[L - 1] := TArray[L];
+                                      end;
+                                      Rg := Rg + 1;
+                                      Seek ( RpFile, Rg       );
+                                      Read ( RpFile, RpMember );
+                                      RArray[R] := Rg;
+                                      TArray[R] := RpMember.Texto;
+                                      F := 'N';
+                                    end
+                                    else F := 'P';
+                               end;
+                         'P' : begin
+                                 N := 0;
+                                 Repeat
+                                   R := 25;
+                                   For L := 1 to 25
+                                   do If TArray[L] <> '' then R  := L;
+                                   If RArray[R] < Tam then
+                                      begin
+                                        Rg := RArray[R];
+                                        For L := 2 to 25 do
+                                        begin
+                                          RArray[L - 1] := RArray[L];
+                                          TArray[L - 1] := TArray[L];
+                                        end;
+                                        Rg := Rg + 1;
+                                        Seek ( RpFile, Rg       );
+                                        Read ( RpFile, RpMember );
+                                        RArray[R] := Rg;
+                                        TArray[R] := RpMember.Texto;
+                                        N := N + 1;
+                                        F := 'N';
+                                      end
+                                      else F := 'P';
+                                 Until (N = 25) or (RArray[R] = Tam);
+                               end;
+                         end;
+                       end;
+         end;
+       Until Cont = #27;
+       Move(ScArrayX[1],MemW[$B800:0000],4000);
+       Color(Tfn,Utx);
+     end;
+  Close ( RpFile );
+  Erase ( RpFile );
+  Close ( LST );
+  Erase ( LST );
+end;
+
+
+Procedure TestaImpressora(X : Char; Y : Str40);
+begin
+  Color(Red,Cyan);
+  GotoXY(1,24); Write(ConstStr(' ',80));
+  GotoXY(2,24);
+  Case X of
+       'T' : begin
+               Write('Ligue a Impressora e tecle <     > ou <   > para Cancelar.');
+               Color(Red,White);
+               GotoXY(30,24); Write('Enter');
+               GotoXY(41,24); Write('Esc');
+               Repeat
+                 TC := ReadKey;
+               Until TC in [#13,#27];
+             end;
+       'I' : begin
+               Write('Imprimindo',' ':44,'(     ',#26,'Para/   ',#26,'Cancela)');
+               Color(Red,Yellow);
+               GotoXY(13,24); Write(Y);
+               Color(Red,White);
+               GotoXY(57,24); Write('Enter');
+               GotoXY(68,24); Write('Esc');
+             end;
+  end;
+end;
+
+
+Procedure WriteLine(T : Char; L : AnyStr);
+Var
+  C1,C2,L1,L2,X,Y   : Byte;
+begin
+  If TC <> #27 then
+     begin
+       X  := WhereX;
+       Y  := WhereY;
+       C1 := 1 + Lo(WindMin);
+       L1 := 1 + Hi(WindMin);
+       C2 := 1 + Lo(WindMax);
+       L2 := 1 + Hi(WindMax);
+       Window(1,1,80,25);
+       Repeat
+         {$I-}
+         Case T of
+              'L' : Writeln(LST,L);
+              'W' : Write  (LST,L);
+         end;
+         {$I+}
+         If IOResult <> 0 then
+            begin
+              Color(Blue,White);
+              GotoXY(1,23); Write(ConstStr(' ',80));
+              GotoXY(2,23);
+              Write('Dispositivo de sa¡da n„o esta dispon¡vel, verifique.       (      ou    )');
+              Color(Blue,Yellow);
+              GotoXY(62,23); Write('Enter');
+              GotoXY(71,23); Write('Esc');
+              Repeat
+                TC := ReadKey;
+              Until TC in [#13,#27];
+              If TC = #13 then TC := #00;
+              LimpaLn(23,Blue);
+            end
+            else begin
+                   ContLin := ContLin + 1;
+                   TC      := #13;
+                 end;
+       Until TC in [#13,#27];
+       Window(C1,L1,C2,L2);
+       GotoXY(X,Y);
+       Color(Sfn,Stx);
+     end;
+end;
+
+
+Procedure LigaArquivo;
+begin
+  Assign (LST, J);
+  {$I-}
+  ReWrite ( LST );
+  {$I+}
+  If IOResult <> 0 then
+     begin
+       Color(Blue,White);
+       GotoXY(1,23); Write(ConstStr(' ',80));
+       GotoXY(2,23);
+       Write('Dispositivo de sa¡da n„o esta dispon¡vel, verifique ',J);
+       TC := ReadKey;
+       TC := #27;
+     end;
+end;
+
+
+Procedure QPorta;
+Var
+  Li,La      : Integer;
+  Porta      : Array[1..9]    of Str5;
+  ScWhat     : Array[1..4000] of Char;
+begin
+  Move(Mem[$B800:0000],ScWhat[1],4000);
+  LimpaLn(23,Tfd);
+  LimpaLn(24,Tfd);
+  Porta[1] := 'LPT1 ';
+  Porta[2] := 'LPT2 ';
+  Porta[3] := 'LPT3 ';
+  Porta[4] := 'COM1 ';
+  Porta[5] := 'COM2 ';
+  Porta[6] := 'COM3 ';
+  Porta[7] := 'COM4 ';
+  Porta[8] := 'Disco';
+  Porta[9] := 'Tela ';
+  DrawBox(33,09,52,20,Bfn,'S');
+  Color(Red,White);
+  GotoXY(33,09); Write(' Escolha a Porta ',#24,#25,' ');
+  Color(Bfn,Btx);
+  GotoXY(34,11); Write('Paralelas');
+  GotoXY(34,14); Write('Seriais  ');
+  GotoXY(34,18); Write('Arquivo  ');
+  Color(Tfn,Utx);
+  GotoXY(44,11); Write('  ',Porta[1],' ');
+  Color(Bfn,Btx);
+  For Li := 12 to 19 do begin
+                          GotoXY(44,Li); Write('  ',Porta[Li-10],' ');
+                        end;
+  TC := #00;
+  Li := 11;
+  Repeat
+    TC := ReadKey;
+    If KeyPressed then TC := ReadKey;
+    If TC in [#72,#80] then
+       begin
+         La := Li;
+         Case TC of
+              #72 : If Li = 11 then Li := 19
+                               else Li := Li - 1;
+              #80 : If Li = 19 then Li := 11
+                               else Li := Li + 1;
+         end;
+         Color(Bfn,Btx);
+         GotoXY(44,La); Write('  ',Porta[La-10],' ');
+         Color(Tfn,Utx);
+         GotoXY(44,Li); Write('  ',Porta[Li-10],' ');
+       end;
+  Until TC = #13;
+  Color(Blue,Cyan);
+  GotoXY(01,23); Write(' ':80);
+  GotoXY(02,23); Write('Imprimindo para ');
+  Color(Blue,White);
+  GotoXY(18,23); Write(Porta[Li-10]);
+  If Li < 18 then
+     begin
+       TestaImpressora('T','');
+       J      := Porta[Li-10];
+       LigaArquivo;
+       DskRpt := 'N';
+     end
+     else If Li = 18 then
+             begin
+               Color(Blue,Yellow);
+               GotoXY(30,23); Write('Nome do arquivo:');
+               Repeat
+                 J := '';
+                 InputStr(J,30,47,23,0,'S','N','T','N',Blue,White);
+                 If (TC <> #27) and (J = '') then TC := #00;
+               Until TC in [#13,#27];
+               If TC = #13 then
+                  begin
+                    J := UpCaseStr(J);
+                    GotoXY(47,23); Write(J);
+                    DskRpt := 'D';
+                    LigaArquivo;
+                  end;
+             end
+             else If Li = 19 then
+                     begin
+                       If TC = #13 then
+                          begin
+                            J := XDrive + '\REPORT.TXT';
+                            DskRpt := 'T';
+                            LigaArquivo;
+                          end;
+                     end;
+  Color(Tfd,Utx);
+  Move(ScWhat[1],Mem[$B800:0000],4000);
+end;
+
+
+

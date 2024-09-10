@@ -1,0 +1,18 @@
+Function EditDouble (V : Double) : Str80;
+var
+   Sinal   : string[1];
+   S       : string[80];
+begin
+  If TruncX(V) < 0 then Sinal := '-'
+                   else Sinal := '';
+  V := Abs(V);
+  Str(V:0:2,S);
+  S[Length(S) - 2] := ',';
+  If Length(S) > 6  then Insert('.',S,(Length(S) -  5));
+  If Length(S) > 10 then Insert('.',S,(Length(S) -  9));
+  If Length(S) > 14 then Insert('.',S,(Length(S) - 13));
+  EditDouble := Sinal + S;
+end;
+
+
+

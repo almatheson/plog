@@ -1,0 +1,16 @@
+Procedure ClearBox(X,Y,L,W : integer);
+Var
+  I : integer;
+
+     Begin
+         TextBackground(0);
+         TextColor(7);
+         I := 0;
+         Repeat
+              GotoXY(X,Y + I); Write(' ' :W);
+              I := I + 1;
+         Until (Y + I = L + 1);
+     end;
+
+
+

@@ -1,0 +1,6 @@
+Procedure EraseScreen (X,Y,X1,Y1:Byte);
+Begin
+  Window( X, Y,X1,Y1);
+  ClrScr;
+  Window(01,01,80,25)
+End;

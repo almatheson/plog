@@ -1,0 +1,85 @@
+Procedure ConfigCRT;
+Var
+  Y,OrigMode     : Integer;
+  TabP           : Array [1..7]    of Str40;
+  TabPP          : Array [1..7]    of Integer;
+
+begin
+  TabPP[1] := 12;
+  TabPP[2] := 13;
+  TabPP[3] := 14;
+  TabPP[4] := 15;
+  TabPP[5] := 16;
+  TabPP[6] := 17;
+  TabPP[7] := 18;
+
+  TabP[1]  := ' 40x25 B/W on color adapter            ';
+  TabP[2]  := ' 80x25 B/W on color adapter            ';
+  TabP[3]  := ' 80x25 B/W on monochrome adapter       ';
+  TabP[4]  := ' 40x25 Color on color adapter          ';
+  TabP[5]  := ' 80x25 Color on color adapter          ';
+  TabP[6]  := ' EGA/VGA 43 and 50 line                ';
+  TabP[7]  := ' Volta a configura‡„o anterior         ';
+
+  Y        := 12;
+  For I := 1 to 7 do begin
+                       If TabPP[I] = Y then Color(Bfn,Btx)
+                                       else Color(Tfn,Ttx);
+                       GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                     end;
+  Color(Tfn,Ttx);
+
+  Repeat
+    Resp := ReadKey;
+    If (Resp = #0 ) and
+       (KeyPressed) then
+       begin
+         Resp := ReadKey;
+         Case Resp of
+              #72 : begin
+                      Y := Y - 1;
+                      If Y < 12 then Y := 18;
+                      For I := 1 to 7 do
+                      begin
+                        If TabPP[I] = Y then Color(Bfn,Btx)
+                                        else Color(Tfn,Ttx);
+                        GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                      end;
+                      Color(Tfn,Ttx);
+                    end;
+              #80 : begin
+                      Y := Y + 1;
+                      If Y > 18 then Y := 12;
+                      For I := 1 to 7 do
+                      begin
+                        If TabPP[I] = Y then Color(Bfn,Btx)
+                                        else Color(Tfn,Ttx);
+                        GotoXY(3,TabPP[I]);  Write(TabP[I]);
+                      end;
+                      Color(Tfn,Ttx);
+                    end;
+         end;
+       end
+       else If Resp = #13 then
+               begin
+                 Case Y of
+                      12 : TextMode(BW40);
+                      13 : TextMode(BW80);
+                      14 : TextMode(Mono);
+                      15 : TextMode(C040);
+                      16 : TextMode(C080);
+                      17 : TextMode(Font8x8);
+                      18 : TextMode(OrigMode);
+                 end;
+
+                 CheckSnow   := False;
+                 DirectVideo := True;
+                 Resp        := #27;
+               end
+               else Resp := #00;
+  Until Resp = #27;
+
+  TC   := #13;
+  Resp := #13;
+end;
+

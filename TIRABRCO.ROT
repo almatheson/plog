@@ -1,0 +1,11 @@
+Function TiraBranco(S : Str80) : Str80;
+Var
+  P     : Integer;
+  F     : Str80;
+begin
+  F := '';
+  For P := 1 to Length(S)
+  do If S[P] <> #32 then F := F + S[P];
+  TiraBranco := F;
+end;
+

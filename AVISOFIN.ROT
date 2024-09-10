@@ -1,0 +1,11 @@
+Procedure AvisoFinal;
+begin
+  Color(Blue,White);
+  GotoXY(1,24); Write(ConstStr(' ',80));
+  GotoXY(2,24); Write('Fim da Lista');
+  Color(Tfn,Ttx);
+  Resp := ' ';
+end;
+
+
+

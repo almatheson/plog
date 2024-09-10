@@ -1,0 +1,19 @@
+Procedure ErrorMessage;
+begin
+  Color(Red,White);
+  GotoXY(01,24); Write(ConstStr(' ',80));
+  GotoXY(02,24); Write('Erro: ');
+  Color(Red,Yellow);
+  GotoXY(08,24); Write(ErroMsg);
+  Color(Red,Cyan);
+  GotoXY(67,24); Write('Tecle [     ]');
+  Color(Red,White);
+  GotoXY(74,24); Write('Enter');
+  Color(Tfd,Ttx);
+  Repeat
+    TC := ReadKey;
+  Until TC = #13;
+  LimpaLn(24,Tfd);
+  Color(Tfn,Utx);
+end;
+

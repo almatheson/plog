@@ -1,0 +1,37 @@
+Procedure Shade(L,T,R,B : Integer;
+                CT,CB   : byte    );
+Var
+  j : Integer;
+  W : Char;
+begin
+  TextColor( CT );
+  TextBackground( CB );
+  For j := T+1 to B+1 do begin
+                           Move(Mem[$B800:((j-1)*160)+(R*2)],W,1);
+                           GotoXY(R+1,j); Write(W);
+                           Move(Mem[$B800:((j-1)*160)+((R+1)*2)],W,1);
+                           GotoXY(R+2,j); Write(W);
+                         end;
+  For j := L+2 to R do begin
+                         Move(Mem[$B800:(B*160)+((j-1)*2)],W,1);
+                         GotoXY(j,B+1); Write(W);
+                       end;
+end;
+
+
+Procedure DrawBox(Esq,Top,Dir,Bot : Integer;
+                  Fundo           : Byte   ;
+                  Sbra            : char   );
+Var
+  I       : Integer;
+
+begin
+  TextBackground( Fundo );
+  For I := Top to Bot do begin
+                           GotoXY(Esq,I); Write(ConstStr(' ',Dir-Esq+1));
+                         end;
+  If Sbra = 'S' then Shade(Esq,Top,Dir,Bot,LightGray,DarkGray);
+end;
+
+
+

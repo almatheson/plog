@@ -1,0 +1,50 @@
+Function DesAcentua(S : AnyStr) : AnyStr;
+Var
+  I,J   : Integer;
+  SS    : AnyStr;
+
+begin
+  I  := 0;
+  J  := Length(S);
+  SS := '';
+  If J > 0 then
+     begin
+       Repeat
+         I := I + 1;
+         Case S[I] of
+              #128 : SS := SS + 'C';
+              #129 : SS := SS + 'u';
+              #130 : SS := SS + 'e';
+              #131 : SS := SS + 'a';
+              #132 : SS := SS + 'a';
+              #133 : SS := SS + 'a';
+              #135 : SS := SS + 'c';
+              #136 : SS := SS + 'e';
+              #137 : SS := SS + 'e';
+              #138 : SS := SS + 'e';
+              #139 : SS := SS + 'i';
+              #141 : SS := SS + 'i';
+              #142 : SS := SS + 'A';
+              #143 : SS := SS + 'A';
+              #144 : SS := SS + 'E';
+              #147 : SS := SS + 'o';
+              #148 : SS := SS + 'o';
+              #149 : SS := SS + 'o';
+              #150 : SS := SS + 'u';
+              #151 : SS := SS + 'u';
+              #152 : SS := SS + 'y';
+              #153 : SS := SS + 'O';
+              #154 : SS := SS + 'U';
+              #160 : SS := SS + 'a';
+              #161 : SS := SS + 'i';
+              #162 : SS := SS + 'o';
+              #163 : SS := SS + 'u';
+              else SS := SS + S[I];
+         end;
+       Until I = J;
+       DesAcentua := SS;
+     end
+     else DesAcentua := '';
+end;
+
+

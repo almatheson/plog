@@ -1,0 +1,457 @@
+Procedure BkpTipo;
+begin
+  DrawBox(4,9,49,19,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(4,09); Write('          Tipos de Backup e Restore           ');
+  Color(Red,Cyan);
+  GotoXY(4,10); Write('          -------------------------           ');
+  GotoXY(4,11); Write(' O Backup ou a Restaura‡„o, pode ser feito de ');
+  GotoXY(4,12); Write(' de 2 maneiras diferentes, interno ou externo ');
+  GotoXY(4,13); Write('                                              ');
+  GotoXY(4,14); Write('      ',#26,' As informa‡”es s„o copiadas dentro    ');
+  GotoXY(4,15); Write('        do pr¢prio winchester.                ');
+  GotoXY(4,16); Write('      ',#26,' As Informa‡”es s„o copiadas para um   ');
+  GotoXY(4,17); Write('        dispositivo Externo.(Disco ou Fita)   ');
+  GotoXY(4,18); Write('                                              ');
+  GotoXY(4,19); Write('                  Selecione a op‡„o desejada. ');
+  Color(Red,White);
+  GotoXY(08,14); Write('I');
+  GotoXY(08,16); Write('E');
+  Color(Black,Utx);
+  BkT := 'E';
+  Repeat
+    BkT := UpCase(ReadKey);
+  Until (BkT = 'E') or (BkT = 'I') or (BkT = #27);
+end;
+
+
+Procedure BkpUniverso;
+begin
+  DrawBox(4,9,49,19,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(4,09); Write('             Universo de Atua‡„o              ');
+  Color(Red,Cyan);
+  GotoXY(4,10); Write('             -------------------              ');
+  GotoXY(4,11); Write(' O Backup ou a Restaura‡„o, pode compreender, ');
+  GotoXY(4,12); Write(' 2 universos diferentes, Parcial ou Total.    ');
+  GotoXY(4,13); Write('                                              ');
+  GotoXY(4,14); Write('      ',#26,' S¢ as informa‡”es de uma empresa s„o  ');
+  GotoXY(4,15); Write('        selecionadas.                         ');
+  GotoXY(4,16); Write('      ',#26,' Todo o Banco de Dados do Sistema ‚    ');
+  GotoXY(4,17); Write('        selecionado.                          ');
+  GotoXY(4,18); Write('                                              ');
+  GotoXY(4,19); Write('                  Selecione a op‡„o desejada. ');
+  Color(Red,White);
+  GotoXY(08,14); Write('P');
+  GotoXY(08,16); Write('T');
+  Color(Black,Utx);
+  BkU := 'T';
+  Repeat
+    BkU := UpCase(ReadKey);
+  Until (BkU = 'T') or (BkU = 'P') or (BkU = #27);
+end;
+
+
+Procedure BkpDrive;
+begin
+  DrawBox(4,9,49,19,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(4,09); Write('             Dispositivo F¡sico               ');
+  Color(Red,Cyan);
+  GotoXY(4,10); Write('             ------------------               ');
+  GotoXY(4,11); Write(' O Backup ou a Restaura‡„o, pode ser feito p/ ');
+  GotoXY(4,12); Write(' qualquer dispositivo f¡sico.                 ');
+  GotoXY(4,13); Write('                                              ');
+  GotoXY(4,14); Write('     , , , ,  ou     ( Dispositivos v lidos ) ');
+  GotoXY(4,15); Write('                                              ');
+  GotoXY(4,16); Write('       Selecione de ac“rdo com a configura‡„o ');
+  GotoXY(4,17); Write('       da sua m quina.                        ');
+  GotoXY(4,18); Write('                                              ');
+  GotoXY(4,19); Write('                  Selecione a op‡„o desejada. ');
+  Color(Red,White);
+  GotoXY(08,14); Write('A');
+  GotoXY(10,14); Write('B');
+  GotoXY(12,14); Write('C');
+  GotoXY(14,14); Write('D');
+  GotoXY(16,14); Write('E');
+  GotoXY(21,14); Write('F');
+  Color(Black,Utx);
+  BkD := 'A';
+  Repeat
+    BkD := UpCase(ReadKey);
+  Until (BkD in ['A','B','C','D','E','F']) or (BkD = #27);
+end;
+
+
+Procedure BkpUtilitario(X : Char);
+begin
+  DrawBox(4,9,49,19,Red,'S');
+  Color(Red,Yellow);
+  GotoXY(4,09); Write('             Utilit rio do DOS                ');
+  Color(Red,Cyan);
+  GotoXY(4,10); Write('             -----------------                ');
+  GotoXY(4,11); Write(' O Backup ou a Restaura‡„o, ‚  executado pelo ');
+  GotoXY(4,12); Write(' programa  utilit rio do pr¢prio DOS, de modo ');
+  GotoXY(4,13); Write(' que  o Sistema necessita  saber aonde esta o ');
+  GotoXY(4,14); Write(' utilit rio, e como se chama. Informe o Drive ');
+  GotoXY(4,15); Write(' e Diret¢rio onde se encontra e o nome do seu ');
+  GotoXY(4,16); Write(' Utilit rio:                                  ');
+  GotoXY(4,17);
+  If X = 'B' then Write('                       (                 )    ')
+             else Write('                       (                  )   ');
+  GotoXY(4,18); Write('                                              ');
+  GotoXY(4,19); Write('                                              ');
+  GotoXY(33,16); Write('Default');
+  Color(Red,Yellow);
+  GotoXY(28,17);
+  Case X of
+       'B' : If Lo(Ver) = 3 then Write(Copy(XDrive,1,2),'\DOS\BACKUP.COM')
+                            else Write(Copy(XDrive,1,2),'\DOS\BACKUP.EXE');
+       'R' : If Lo(Ver) = 3 then Write(Copy(XDrive,1,2),'\DOS\RESTORE.COM')
+                            else Write(Copy(XDrive,1,2),'\DOS\RESTORE.EXE');
+  end;
+  Color(Black,Utx);
+
+  J := '';
+  Repeat
+    InputStr(J,20,28,18,0,'S','N','T','N',Red,White);
+    If (TC <> #27) and
+       (J  =  '' ) then
+       begin
+         TC := 'N';
+         Case X of
+              'B' : If Lo(Ver) = 3 then J := Copy(XDrive,1,2) + '\DOS\BACKUP.COM'
+                                   else J := Copy(XDrive,1,2) + '\DOS\BACKUP.EXE';
+              'R' : If Lo(Ver) = 3 then J := Copy(XDrive,1,2) + '\DOS\RESTORE.COM'
+                                   else J := Copy(XDrive,1,2) + '\DOS\RESTORE.EXE';
+         end;
+       end
+       else XDir := UpCaseStr(J);
+  Until (TC = #13) or (TC = #27);
+  Color(Tfn,Utx);
+end;
+
+
+Procedure ErroNoDos;
+begin
+  GotoXY(10,15); Write('N„o foi poss¡vel Executar.');
+
+  Color(Tfn,Utx);
+  GotoXY(10,17);
+
+  Case DosError of
+       2  :  Write('DosError: ',DosError,'  (N„o encontrei o Programa)');
+       3  :  Write('DosError: ',DosError,'  (Path esta Inv lido)');
+       5  :  Write('DosError: ',DosError,'  (Acesso foi negado)');
+       6  :  Write('DosError: ',DosError,'  (Manipula‡„o esta Invalida)');
+       8  :  Write('DosError: ',DosError,'  (N„o tem mem¢ria Suficiente)');
+       10 :  Write('DosError: ',DosError,'  (Environment esta Inv lido)');
+       11 :  Write('DosError: ',DosError,'  (Formato esta Inv lido)');
+       18 :  Write('DosError: ',DosError,'  (N„o tem mais arquivos)');
+       else  Write('DosError: ',DosError);
+  end;
+end;
+
+
+Procedure ErroNoDosEx;
+begin
+  Color(Tfn,Utx);
+  GotoXY(10,17);
+
+  Case Lo(DosEx) of
+       1  :  Write('N„o encontrei os Arquivos     ');
+       2  :  Write('Alguns Arq.n„o foram copiados ');
+       3  :  Write('Cancelado pelo usu rio(Ctrl-C)');
+       4  :  Write('Processo interrompido por erro');
+  end;
+end;
+
+
+Procedure BkpTotal;
+begin
+  Color(Black,LightGray);
+  ClrScr;
+  Fecha;
+  SwapVectors;
+  Exec(XDir,XDrive + '\*.* ' + BkD + ':/S');
+  SwapVectors;
+  Abre;
+end;
+
+
+Procedure BkpParcial(X : Char);
+begin
+  CmpyNo := '';
+  CmpyAC := '';
+  ScrollCia('S');
+  If CmpyAC <> '' then
+     begin
+       Fecha;
+       Color(Black,LightGray);
+       ClrScr;
+       SwapVectors;
+       Exec(XDir,XDrive + '\' + X + 'LOGM' + CmpyAC + '\*.* ' + BkD + ':');
+       SwapVectors;
+       Abre;
+     end
+     else TC := #27;
+end;
+
+
+Procedure FileBackup(X : Char);
+begin
+  Titulo := 'Processamento de Backup                ';
+  BkpTipo;
+  If BkT in ['E','I'] then
+     begin
+       Case BkT of
+            'E' : begin
+                    BkpUtilitario('B');
+                    If TC = #13 then
+                       begin
+                         BkpDrive;
+                         If BkD <> #27 then
+                            begin
+                              BkpUniverso;
+                              Case BkU of
+                                   'T' : BkpTotal;
+                                   'P' : BkpParcial(X);
+                              end;
+                            end;
+                       end;
+                  end;
+            'I' : begin
+                    CmpyNo := '';
+                    CmpyAC := '';
+                    ScrollCia('S');
+                    If CmpyAC <> '' then
+                       begin
+                         Fecha;
+                         Color(Black,LightGray);
+                         ClrScr;
+                         J := Copy(XDrive,1,7) + 'BKP';
+                         {$I-}
+                         Mkdir ( J );
+                         {$I+}
+                         If IOResult >= 0 then
+                            begin
+                              ChDir ( J );
+                              J := '/C COPY ' + XDrive + '\*.* ' + J;
+                              Exec('\COMMAND.COM',J);
+                              J := Copy(XDrive,1,7) + 'BKP\' + X + 'LOGM' + CMPYAC;
+                              XPath := XDrive + '\' + X + 'LOGM' + CmpyAC;
+                              {$I-}
+                              Mkdir ( J );
+                              {$I+}
+                              If IOResult >= 0 then
+                                 begin
+                                   ChDir ( J );
+                                   J := '/C COPY ' + XPath + '\*.* ' + J;
+                                   Exec('\COMMAND.COM',J);
+                                 end;
+                            end;
+                         Abre;
+                       end;
+                  end;
+            else TC := #27;
+       end;
+       If (TC <> #27) and (BkT = 'E') then
+          begin
+            Move(ScArray4[1],Mem[$B800:0000],4000);
+            Color(Red,Yellow);
+            GotoXY(61,09); Write('Backup Externo   ');
+            Color(Red,Cyan);
+            GotoXY(61,10); Write('--------------   ');
+            GotoXY(61,12); Write('Drive            ');
+            GotoXY(61,14); Write('Tipo             ');
+            GotoXY(61,17); Write('--------------   ');
+            Color(Red,White);
+            GotoXY(67,12); Write(BkD,':');
+            GotoXY(67,14);
+            Case BkU of
+                 'T' : Write('Total  ');
+                 'P' : begin
+                         Write('Parcial');
+                         Color(Red,Cyan);
+                         GotoXY(61,16); Write('Cia');
+                         Color(Red,White);
+                         GotoXY(65,16); Write(CmpyAC);
+                       end;
+            end;
+            Shade(3,8,60,21,LightGray,Black);
+            Color(Tfn,Ttx);
+            GotoXY(10,15);
+            DosEx := DosExitCode;
+            If DosError <> 0 then ErroNoDos
+               else If Hi(DosEx) <> 0
+                       then Write('Execu‡„o cancelada pelo Usu rio')
+                       else If Lo(DosEx) <> 0 then ErroNoDosEx
+                               else begin
+                                      Write('A execu‡„o terminou normalmente.');
+                                      Color(Tfn,Utx);
+                                      GotoXY(10,18);
+                                      Write('----> Coloque a Data na Etiqueta [',XDia,'/',XMes,'/',XAno,']');
+                                      Case BkU of
+                                           'P' : begin
+                                                   CmpyMember.DataBkp := XDia + '/' + XMes + '/' + XAno;
+                                                   ReadWrite(#02,'W','N',CmpyAN);
+                                                 end;
+                                           'T' : begin
+                                                   MasterMember.DataBkp := XDia + '/' + XMes + '/' + XAno;
+                                                   ReadWrite(#00,'W','N',0);
+                                                 end;
+                                      end;
+                                    end;
+            TeclaReturn;
+            Move(ScArray1[1],Mem[$B800:0000],4000);
+            Color(Sfn,Stx);
+            GotoXY(57,9); Write(MasterMember.DataBkp);
+            Move(Mem[$B800:0000],ScArray1[1],4000);
+          end;
+     end;
+end;
+
+
+Procedure ResTotal;
+begin
+  Color(Black,LightGray);
+  ClrScr;
+  Fecha;
+  SwapVectors;
+  Exec(XDir,BkD + ': ' + XDrive + '\*.* /S');
+  SwapVectors;
+  Abre;
+end;
+
+
+Procedure ResParcial(X : Char);
+begin
+  CmpyNo := '';
+  CmpyAC := '';
+  ScrollCia('S');
+  If CmpyAC <> '' then
+     begin
+       Fecha;
+       Color(Black,LightGray);
+       ClrScr;
+       SwapVectors;
+       Exec(XDir,BkD + ': ' + XDrive + '\' + X + 'LOGM' + CmpyAC + '\*.*');
+       SwapVectors;
+       Abre;
+     end
+     else TC := #27;
+end;
+
+
+Procedure FileRestore(X : Char);
+begin
+  Titulo := 'Processamento de Restaura‡„o           ';
+  BkpTipo;
+  If BkT in ['E','I'] then
+     begin
+       Case BkT of
+            'E' : begin
+                    BkpUtilitario('R');
+                    If TC = #13 then
+                       begin
+                         BkpDrive;
+                         If BkD <> #27 then
+                            begin
+                              BkpUniverso;
+                              Case BkU of
+                                   'T' : ResTotal;
+                                   'P' : ResParcial(X);
+                              end;
+                            end;
+                       end;
+                  end;
+            'I' : begin
+                    CmpyNo := '';
+                    CmpyAC := '';
+                    ScrollCia('S');
+                    If CmpyAC <> '' then
+                       begin
+                         Fecha;
+                         Color(Black,LightGray);
+                         ClrScr;
+                         J := Copy(XDrive,1,7) + 'BKP';
+                         J := '/C COPY ' + J + '\*.* ' + XDrive;
+                         Exec('\COMMAND.COM',J);
+                         J     := Copy(XDrive,1,7) +
+                                  'BKP\' + X + 'LOGM' + CMPYac + '\*.* ';
+                         XPath := XDrive + '\' + X + 'LOGM' + CmpyAC;
+                         J     := '/C COPY ' + J + XPath;
+                         Exec('\COMMAND.COM',J);
+                         Abre;
+                       end;
+                  end;
+            else TC := #27;
+       end;
+       If (TC <> #27) and (BkT = 'E') then
+          begin
+            Move(ScArray4[1],Mem[$B800:0000],4000);
+            Color(Red,Yellow);
+            GotoXY(61,09); Write('Restore Externo  ');
+            Color(Red,Cyan);
+            GotoXY(61,10); Write('---------------  ');
+            GotoXY(61,12); Write('Drive            ');
+            GotoXY(61,14); Write('Tipo             ');
+            GotoXY(61,17); Write('---------------  ');
+            Color(Red,White);
+            GotoXY(67,12); Write(BkD,':');
+            GotoXY(67,14);
+            Case BkU of
+                 'T' : Write('Total  ');
+                 'P' : begin
+                         Write('Parcial');
+                         Color(Red,Cyan);
+                         GotoXY(61,16); Write('Cia');
+                         Color(Red,White);
+                         GotoXY(65,16); Write(CmpyAC);
+                       end;
+            end;
+            Shade(3,8,60,21,LightGray,Black);
+            Color(Tfn,Ttx);
+            GotoXY(10,15);
+            DosEx := DosExitCode;
+            If DosError <> 0 then ErroNoDos
+               else If Hi(DosEx) <> 0
+                       then Write('Execu‡„o cancelada pelo Usu rio')
+                       else If Lo(DosEx) <> 0 then ErroNoDosEx
+                               else Write('A execu‡„o terminou normalmente.');
+            TeclaReturn;
+          end;
+       If (BkU = 'T') and (TC <> #27) then Recarga;
+     end;
+end;
+
+
+Procedure DosShell;
+begin
+  Fecha;
+  {$I-}
+  ChDir ( XDrive );
+  {$I+}
+  If IOResult = 0 then
+     begin
+       Color(Black,White);
+       ClrScr;
+       SetCursor(1);
+       Repeat
+         J := '';
+         Readln(J);
+         J := UpCaseStr(J);
+         If J <> 'EXIT' then
+            begin
+              SwapVectors;
+              Exec('\COMMAND.COM','/C ' + J);
+              SwapVectors;
+              If DosError <> 0 then Writeln('DosError: ',DosError);
+            end;
+       Until J = 'EXIT';
+       SetCursor(0);
+     end;
+  Abre;
+  Color(Tfn,Utx);
+end;
+

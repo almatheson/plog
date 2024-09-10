@@ -1,0 +1,6 @@
+Procedure Color(Back : Byte;
+                Txto : Byte);
+begin
+  TextBackground(Back);
+  TextColor(Txto);
+end;

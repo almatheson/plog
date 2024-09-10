@@ -1,0 +1,30 @@
+Procedure MakeBox(X,Y,L,W : Integer;
+                  B,F     : Byte   ;
+                  V       : Integer);
+Var
+  I    : integer;
+
+begin
+  Color(0,F);
+  GotoXY(X,Y); Write(#201,ConstStr(#205,W - 2),#187);
+
+  I := 0;
+  Repeat
+    I := I + 1;
+
+    GotoXY(X,Y + I); Write(#186);
+    GotoXY(X + W - 1,Y + I); Write(#186);
+
+    If V = 0 then
+       begin
+         Color(B,F);
+         GotoXY((X + 1),Y + I); Write(ConstStr(' ',(W - 2)));
+         Color(0,F);
+       end;
+
+  Until (Y + I = L - 1);
+  GotoXY(X,L); Write(#200,ConstStr(#205,W - 2),#188);
+end;
+
+
+

@@ -1,0 +1,6 @@
+
+Procedure ShowHeap;
+begin
+  Color(Red,White);
+  GotoXY(69,3); Write(Trunc(MemAvail / 1024):3,'Kb.');
+end;

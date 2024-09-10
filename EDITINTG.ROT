@@ -1,0 +1,16 @@
+Function EditInteger (V : Integer) : Str80;
+var
+   Sinal   : Char;
+   S       : string[80];
+begin
+  If V < 0 then Sinal := '-'
+           else Sinal := ' ';
+  Str(V,S);
+  If Length(S) > 3  then Insert('.',S,(Length(S) -  2));
+  If Sinal = '-' then EditInteger := Sinal + S
+                 else EditInteger := S;
+end;
+
+
+
+

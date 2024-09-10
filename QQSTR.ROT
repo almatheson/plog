@@ -1,0 +1,12 @@
+Function QQStr(X : Real;I : Integer;F : Char) : Str80;
+Var
+  T : Integer;
+  S : Str80;
+begin
+  Str(X:15:0,S);
+  S := LeftAdjust(S);
+  If Length(S) < I then For T := Length(S) to I-1 do S := F + S;
+  QQStr := S;
+end;
+
+

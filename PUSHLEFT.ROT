@@ -1,0 +1,8 @@
+Function PushLeft(I : Integer; X : AnyStr) : AnyStr;
+begin
+  If Length(X) < I then PushLeft := X + ConstStr(' ',(I - Length(X)))
+                   else PushLeft := X;
+end;
+
+
+

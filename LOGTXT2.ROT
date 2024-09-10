@@ -1,0 +1,231 @@
+Function Qualidade(T,R : Char) : Str2;
+begin
+  Case T of
+       'C' : Case R of
+                  '\' : Qualidade := Cx;
+                  '/' : Qualidade := Cf;
+             end;
+       'D' : Case R of
+                  '\' : Qualidade := Dx;
+                  '/' : Qualidade := Df;
+             end;
+       'N' : Case R of
+                  '\' : Qualidade := Nx;
+                  '/' : Qualidade := Nf;
+             end;
+       'L' : Qualidade := '';
+       'F' : begin
+               Qualidade := '';
+	       TC        := #27;
+             end;
+       'P' : begin
+               Qualidade := Qp;
+               If R = 'F' then TC := #27
+                          else TC := #00;
+             end;
+       else  Qualidade := '';
+  end;
+end;
+
+
+Function Substitui(X : AnyStr) : AnyStr;
+Var
+  Ti,Si,Ad           : Char;
+  I,Nu,L,Tm1,Tm2,Tm3 : Integer;
+  T1,T2              : Str2;
+  S                  : Str80;
+  Chv,Xn             : AnyStr;
+begin
+  I  := Length(X);
+  Xn := '';
+  L  := 0;
+  If I > 1 then
+     begin
+       Repeat
+         L := L + 1;
+         Case X[L] of
+              '#' : begin
+                      L  := L + 1;
+                      Ti := UpCase(X[L]);
+                      L  := L + 1;
+                      Val(Copy(X,L,2),Nu,E);
+                      L := L + 2;
+                      T1 := Qualidade(UpCase(X[L]),'\');
+                      T2 := Qualidade(UpCase(X[L]),'/');
+                      Chv := '';
+                      Tm1 := 0;
+                      Tm2 := 0;
+                      Tm3 := 0;
+                      Ad  := ' ';
+                      If X[L+1] in ['\','+','-'] then
+                         begin
+                           L := L + 1;
+                           Case X[L] of
+                                '+','-' : Si := X[L];
+                                else      Si := ' ';
+                           end;
+                           Repeat
+                             L := L + 1;
+                             If X[L] <> '/' then Chv := Chv + X[L];
+                           Until (X[L] = '/') or (L = I);
+                           If L < I then
+                              begin
+                                If X[L+1] in ['=',':'] then
+                                   begin
+                                     Ad := X[L+1];
+                                     L  := L + 2;
+                                     Val(Copy(X,L,2),Tm1,E);
+                                     L := L + 1;
+                                     If X[L+1] = ',' then
+                                        begin
+                                          Ad := '*';
+                                          L  := L + 2;
+                                          Val(Copy(X,L,2),Tm2,E);
+                                          L := L + 1;
+                                          If X[L+1] = ',' then
+                                             begin
+                                               L := L + 2;
+                                               Val(Copy(X,L,2),Tm3,E);
+                                               L := L + 1;
+                                             end;
+                                        end;
+                                   end;
+                              end;
+                         end;
+		      Case Ad of
+                         '=' : S := PushLeft(Tm1,Campo(Ti,Si,Nu,Tm1,Tm2,Tm3,Chv));
+                         ':' : S := PushRight(Tm1,Campo(Ti,Si,Nu,Tm1,Tm2,Tm3,Chv));
+                         else  S := Campo(Ti,Si,Nu,Tm1,Tm2,Tm3,Chv);
+                      end;
+                      If S <> '' then Xn := Xn + T1 + S + T2;
+                    end;
+              '@' : begin
+                      L := L + 1;
+                      If (X[L+1] = '\') and
+                         (X[L+2] = ':') then Val(Copy(X,L+3,2),Tm1,E)
+                                        else Tm1 := 0;
+                      Xn := Xn + Qualidade(UpCase(X[L]),UpCase(X[L+1]));
+                      If Tm1 > 0 then
+                         begin
+                           Xn := Xn + ConstStr(' ',Tm1);
+                           L  := L + 4;
+                         end
+                         else L := L + 1;
+                    end;
+              else Xn := Xn + X[L];
+         end;
+       Until L >= I;
+     end
+     else Xn := X;
+  SubStitui := Xn;
+end;
+
+
+Procedure PrintText(Suf : Str3);
+Var
+  RegLst,RegTxt   : AnyStr;
+{  TxtFile2        : Text; }
+begin
+  SelectTxt(Copy(XPath,1,Length(XPath)-4) + 'TEXT',Suf);
+  If TxtPath <> '' then
+     begin
+       Assign ( TxtFile, (TxtPath));
+       {$I-}
+       Reset ( TxtFile );
+       {$I+}
+       If IOResult = 0 then
+          begin
+            QPorta;
+            If TC = #13 then
+               begin
+                 Inicializa(DskRpt);
+                 TestaImpressora('I',TxtPath);
+                 If Laser = 'S' then WriteLine('W',LaserInit);
+                 While (not Eof(TxtFile)) and (TC <> #27) do
+                 begin
+                   {$I-}
+                   Readln(TxtFile,RegTxt);
+                   {$I+}
+                   If IOResult = 0 then
+                      begin
+                        TC     := #13;
+                        RegLst := Substitui(RegTxt);
+                        Case TC of
+                             #13 : Writeln(LST,Acentua(RegLst));
+                             else  Write  (LST,Acentua(RegLst));
+                        end;
+                      end;
+                   If KeyPressed then
+                      begin
+                        TC := ReadKey;
+                        If TC = #13 then
+                           Repeat
+                             TC := ReadKey;
+                           Until (TC = #13) or (TC = #27);
+                      end;
+                 end;
+                 Close ( LST );
+               end;
+            Close ( TxtFile );
+            LimpaLn(24,Tfd);
+          end
+          else begin
+                 GotoXY(1,23); Write(' ':80);
+                 GotoXY(2,23); Write('Nao encontrei o arquivo ' + TxtPath);
+                 TC := ReadKey;
+               end;
+     end
+     else begin
+            GotoXY(1,23); Write(' ':80);
+            GotoXY(2,23); Write('Nao ha arquivo selecionado ' + TxtPath);
+            TC := ReadKey;
+          end;
+end;
+
+
+Procedure PrintBackGround(X : Str3);
+Var
+  ScBack   : Array[1..4000] of Char;
+begin
+  Color(Red,Cyan);
+  GotoXY(1,24); Write(' ':80);
+  GotoXY(2,24); Write('Onde esta o arquivo para Imprimir:');
+  Color(Red,White);
+  J := '';
+  InputStr(J,30,37,24,0,'S','N','T','N',Red,White);
+  If (TC = #13) and (J <> '') then
+     begin
+       SelectTxt(UpCaseStr(J),X);
+       If TxtPath <> '' then
+          begin
+            Move(Mem[$B800:0000],ScBack[1],4000);
+            Color(Black,White);
+            Window(1,23,80,25);
+            ClrScr;
+            XDir := Copy(XDrive,1,2) + '\DOS\PRINT.EXE ';
+            SwapVectors;
+            Exec(XDir,TxtPath);
+            SwapVectors;
+            Window(1,1,80,25);
+            Move(ScBack[1],Mem[$B800:0000],4000);
+            Color(Blue,Yellow);
+            GotoXY(1,23); Write(' ':80);
+            GotoXY(2,23);
+            Case DosError of
+                 0  : begin
+                        Color(Blue,Cyan);
+                        GotoXY(2,23); Write('Imprimindo em BackGround o Arquivo: ');
+                        Color(Blue,White);
+                        GotoXY(38,23); Write(TxtPath);
+                      end;
+                 2  : Write('DosError: ',DosError,' (N„o encontrei o programa)');
+                 3  : Write('DosError: ',DosError,' (Path Inv lido)');
+                 8  : Write('DosError: ',DosError,' (N„o tem mem¢ria Suficiente)');
+                 10 : Write('DosError: ',DosError,' (Ambiente est  Invalido)');
+                 else Write('DosError: ',DosError);
+            end;
+            TeclaReturn;
+          end;
+     end;
+  LimpaLn(23,Tfd);
+end;

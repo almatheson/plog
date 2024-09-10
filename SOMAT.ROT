@@ -1,0 +1,43 @@
+Function Somatorio  (C,L : Integer) : Double;
+Var
+  Li        : Integer;
+  Vl,Soma   : Double;
+
+begin
+  DrawBox(C,L,C+21,L+9,Sfn,'S');
+  Color(Bfn,Btx);
+  GotoXY(C,L);   Write('        Parcelas      ');
+  GotoXY(C,L+1); Write(' N§           Val“res ');
+  GotoXY(C,L+7); Write(' ä ',#26,'                  ');
+  Color(Red,Yellow);
+  GotoXY(C,L+8); Write(' P ',#26,'                  ');
+  Color(Red,Cyan);
+  GotoXY(C,L+9); Write('              Esc=Fim ');
+
+  Li   := 0;
+  Soma := 0;
+  Vl   := 0;
+
+  Repeat
+    J := '';
+    InputStr(J,15,C+6,L+8,0,'S','N','$','N',Red,White);
+    If TC <> #27 then
+       begin
+         Li := Li + 1;
+         Val(J,Vl,E);
+         Soma := Soma + TruncX(Vl);
+         Window(C+1,L+2,C+21,L+6);
+         Color(Sfn,Stx);
+         GotoXY(1,5); Writeln(Li:2,' ',EditDouble(Vl):17);
+         Window(1,1,80,25);
+         Color(Bfn,Yellow);
+         GotoXY(C+4,L+7); Writeln(EditDouble(Soma):17);
+         Vl := 0;
+       end;
+  Until TC = #27;
+  TC        := #13;
+  Somatorio := Soma;
+end;
+
+
+

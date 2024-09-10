@@ -1,0 +1,12 @@
+Function ConstStr (C : Char; N : Integer) : AnyStr;
+Var
+   S : string[255];
+begin
+  If N < 0 then N := 0;
+  S[0]     := Chr (N);
+  FillChar(S[1],N,C);
+  ConstStr := S;
+end;
+
+
+

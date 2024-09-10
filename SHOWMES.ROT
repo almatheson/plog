@@ -1,0 +1,6 @@
+Procedure ShowMes;
+begin
+  Color(Red,White);
+  GotoXY(59,4); Write(' ':16);
+  GotoXY(59,4); Write(ArrayMesEx[MM],'/',AA);
+end;

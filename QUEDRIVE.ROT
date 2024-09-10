@@ -1,0 +1,44 @@
+Procedure QueDrive;
+begin
+  Color(Tfn,Yellow);
+  GotoXY(4,10);  Write('Drive.:');
+  Color(Bfn,Btx);
+  GotoXY(10,14); Write('                                      ');
+  GotoXY(10,15); Write(' Selecione qual o Drive a  ser usado: ');
+  GotoXY(10,16); Write('                                      ');
+  GotoXY(10,17); Write('      ou       ----> Diskette         ');
+  GotoXY(10,18); Write('          ou   ----> Winchester       ');
+  GotoXY(10,19); Write('                                      ');
+  Color(Bfn,Yellow);
+  GotoXY(14,17); Write('A');
+  GotoXY(19,17); Write('B');
+  GotoXY(14,18); Write('C,D,E');
+  GotoXY(23,18); Write('F');
+  Color(Tfn,Utx);
+
+  Repeat
+    If XDisco = '' then J := XDrive[1]
+                   else J := XDisco[1];
+
+    InputStr(J,1,12,10,0,'S',Tfn,Utx);
+
+    XDisco := UpCase(J[1]);
+
+    If (XDisco[1] in ['A','B','C','D','E','F']) and
+       (TC        <> #27                      ) then
+       begin
+         Confirma;
+
+         If XDisco[1] in ['C','D','E','F']
+            then XDisco := XDisco + Copy(XPathV,2,18) + '\'
+            else XDisco := XDisco + ':';
+       end
+       else If TC <> #27 then
+               begin
+                 ErroMsg := 'Drive Invalido';
+                 ErrorMessage;
+               end;
+  Until (TC = #27) or (UpCase(TC) = 'S');
+end;
+
+

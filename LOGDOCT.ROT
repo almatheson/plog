@@ -1,0 +1,675 @@
+
+   Procedure HelpManual;
+
+
+Implementation
+
+Type
+  PointerI  = ^STreeI;
+  STreeI    = RECORD
+		ChaveI         : Str2;
+                LeftI,RightI   : PointerI;
+                RelMin,RelMax  : Integer;
+                Nome           : Str50;
+              END;
+  Manual    = RECORD
+                Texto       : String[50];
+              END;
+  Indice    = RECORD
+                Capitulo      : String[2];
+                RelMin,RelMax : Integer;
+                Descricao     : String[50];
+              END;
+
+Var
+   MaMember       : Manual;
+   MaFile         : FILE OF Manual;
+   InMember       : Indice;
+   InFile         : FILE OF Indice;
+   RootI          : PointerI;
+   IAddress       : PointerI;
+   InNo,InAC      : Str2;
+
+
+Procedure LoadTreeI ( Var RootI : PointerI );
+begin
+  If RootI = NIL then
+     begin
+       New ( RootI );
+       RootI^.ChaveI := InNo;
+       RootI^.LeftI  := NIL;
+       RootI^.RightI := NIL;
+       RootI^.RelMin := 0;
+       RootI^.RelMax := 0;
+       RootI^.Nome   := '';
+       IAddress      := RootI;
+     end
+     else If InNo < RootI^.ChaveI then LoadTreeI ( RootI^.LeftI  )
+                                  else LoadTreeI ( RootI^.RightI );
+end;
+
+
+Procedure SearchTreeI ( Var RootI : PointerI );
+begin
+  If RootI = NIL then RC := 'N'
+     else If InNo < RootI^.ChaveI
+             then SearchTreeI ( RootI^.LeftI )
+             else If InNo > RootI^.ChaveI
+                     then SearchTreeI ( RootI^.RightI )
+                     else begin
+                            RC       := 'S';
+                            IAddress := RootI;
+                          end;
+end;
+
+
+Procedure SearchAntI ( Var RootI : PointerI );
+begin
+  If RootI <> NIL then
+     begin
+       If (RootI^.RightI <> NIL          ) and
+          (InNo           > RootI^.ChaveI) then SearchAntI ( RootI^.RightI );
+       If (RC   = 'N'          ) and
+          (InNo > RootI^.ChaveI) then
+          begin
+            RC       := 'S';
+            IAddress := RootI;
+            InNo     := RootI^.ChaveI;
+          end
+          else If RC = 'N' then If RootI^.LeftI  <> NIL
+                                   then SearchAntI ( RootI^.LeftI  );
+     end;
+end;
+
+
+Procedure SearchPosI ( Var RootI : PointerI );
+begin
+  If RootI <> NIL then
+     begin
+       If (RootI^.LeftI  <> NIL          ) and
+          (InNo          <  RootI^.ChaveI) then SearchPosI ( RootI^.LeftI );
+       If (RC   = 'N'          ) and
+          (InNo < RootI^.ChaveI) then
+          begin
+            RC       := 'S';
+            IAddress := RootI;
+            InNo     := RootI^.ChaveI;
+          end
+          else If RC = 'N' then If RootI^.RightI <> NIL
+                                   then SearchPosI ( RootI^.RightI );
+     end;
+end;
+
+
+Procedure LoadManual;
+begin
+  RootI := NIL;
+  If FileSize(InFile) <> 0 then
+     begin
+       I := -1;
+       Repeat
+         I := I + 1;
+         {$I-}
+         Seek ( InFile, I        );
+         Read ( InFile, InMember );
+         {$I+}
+         If IOResult = 0 then
+            begin
+              InNo := InMember.Capitulo;
+              LoadTreeI ( RootI );
+              IAddress^.RelMin := InMember.RelMin;
+              IAddress^.RelMax := InMember.RelMax;
+              IAddress^.Nome   := InMember.Descricao;
+            end;
+       Until (I + 1) = FileSize(InFile);
+       OpMn := 'S';
+     end;
+end;
+
+
+Procedure ScrollManual;
+Var
+   Cont,Direcao,
+   F,Tkb          : Char;
+   L,Rg,R,N       : Integer;
+   RArray         : Array[1..19]   of Integer;
+   TArray         : Array[1..19]   of Str50;
+   ScArrayM       : Array[1..4000] of Char;
+begin
+  Move(MemW[$B800:0000],ScArrayM[1],4000);
+  Color(Blue,White);
+  GotoXY(01,23); Write(ConstStr(' ',80));
+  GotoXY(10,23); Write(#25);
+  GotoXY(12,23); Write('PgDn');
+  GotoXY(36,23); Write(#24);
+  GotoXY(38,23); Write('PgUp');
+  GotoXY(63,23); Write('Esc');
+  Color(Blue,Cyan);
+  GotoXY(11,23); Write('/');
+  GotoXY(17,23); Write(#26,' Pr¢xima');
+  GotoXY(37,23); Write('/');
+  GotoXY(43,23); Write(#26,' Anterior');
+  GotoXY(67,23); Write(#26,' Fim');
+  Color(Red,White);
+  GotoXY(1,24);
+  GotoXY(01,24); Write(ConstStr(' ',80));
+  DrawBox(12,1,69,21,Bfn,'S');
+  Color(Tfn,Ttx);
+  GotoXY(12,1); Write(ConstStr(' ',58));
+  GotoXY(13,1); Write(InNo,' ',#26,' ',IAddress^.Nome);
+  Color(Sfn,Stx);
+  For L := 1 to 19 do begin
+                        RArray[L] := 0;
+                        TArray[L] := '';
+                      end;
+  Tkb     := 'L';
+  F       := 'N';
+  Direcao := 'P';
+  L       := 0;
+  Rg      := IAddress^.RelMin - 1;
+  Repeat
+    L  := L  + 1;
+    Rg := Rg + 1;
+    Seek ( MaFile, Rg       );
+    Read ( MaFile, MaMember );
+    RArray[L] := Rg;
+    TArray[L] := MaMember.Texto;
+  Until (Rg = IAddress^.RelMax) or (L = 19);
+  Repeat
+    Window(12,2,70,21);
+    Color(Bfn,Btx);
+    For I := 1 to 19 do begin
+                          GotoXY(1,I);
+                          Write(' ',TArray[I],' ':51-Length(TArray[I]));
+                        end;
+    Window(1,1,80,25);
+    Cont := ReadKey;
+    If (Cont = #0) and (KeyPressed) then
+       begin
+         Cont := ReadKey;
+         Case Cont of
+              #72 : begin
+                      Tkb     := 'L';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(10,23); Write(#25);
+                      GotoXY(12,23); Write('PgDn');
+                      GotoXY(38,23); Write('PgUp');
+                      Color(Blue,(White + Blink));
+                      GotoXY(36,23); Write(#24);
+                    end;
+              #73 : begin
+                      Tkb     := 'P';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(10,23); Write(#25);
+                      GotoXY(12,23); Write('PgDn');
+                      GotoXY(36,23); Write(#24);
+                      Color(Blue,(White + Blink));
+                      GotoXY(38,23); Write('PgUp');
+                    end;
+              #80 : begin
+                      Tkb     := 'L';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(10,23); Write(#25);
+                      Color(Blue,White);
+                      GotoXY(12,23); Write('PgDn');
+                      GotoXY(36,23); Write(#24);
+                      GotoXY(38,23); Write('PgUp');
+                    end;
+              #81 : begin
+                      Tkb     := 'P';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(12,23); Write('PgDn');
+                      Color(Blue,White);
+                      GotoXY(10,23); Write(#25);
+                      GotoXY(36,23); Write(#24);
+                      GotoXY(38,23); Write('PgUp');
+                    end;
+              else Direcao := ' ';
+         end;
+       end
+       else Direcao := 'N';
+    LimpaLn(24,Red);
+    Case Direcao of
+         'A' : If F <> 'A' then
+                  begin
+                    Case Tkb of
+                         'L' : If RArray[1] > IAddress^.RelMin then
+                                  begin
+                                    Rg := RArray[1] - 1;
+                                    For L := 19 downto 2 do
+                                    begin
+                                      RArray[L] := RArray[L - 1];
+                                      TArray[L] := TArray[L - 1];
+                                    end;
+                                    Seek ( MaFile, Rg       );
+                                    Read ( MaFile, MaMember );
+                                    RArray[1] := Rg;
+                                    TArray[1] := MaMember.Texto;
+                                    F := 'N';
+                                  end
+                                  else F := 'A';
+                         'P' : begin
+                                 N := 0;
+                                 Repeat
+                                   If RArray[1] > IAddress^.RelMin then
+                                      begin
+                                        Rg := RArray[1] - 1;
+                                        For L := 19 downto 2 do
+                                        begin
+                                          RArray[L] := RArray[L - 1];
+                                          TArray[L] := TArray[L - 1];
+                                        end;
+                                        Seek ( MaFile, Rg       );
+                                        Read ( MaFile, MaMember );
+                                        RArray[1] := Rg;
+                                        TArray[1] := MaMember.Texto;
+                                        N := N + 1;
+                                        F := 'N';
+                                      end
+                                      else F := 'A';
+                                 Until (N         = 19              ) or
+                                       (RArray[1] = IAddress^.RelMin);
+                               end;
+                    end;
+                  end;
+         'P' : If F <> 'P' then
+                  begin
+                    Case Tkb of
+                         'L' : begin
+                                 R := 19;
+                                 For L := 1 to 19
+                                 do If TArray[L] <> '' then R  := L;
+                                 If RArray[R] < IAddress^.RelMax then
+                                    begin
+                                      Rg := RArray[R];
+                                      For L := 2 to 19 do
+                                      begin
+                                        RArray[L - 1] := RArray[L];
+                                        TArray[L - 1] := TArray[L];
+                                      end;
+                                      Rg := Rg + 1;
+                                      Seek ( MaFile, Rg       );
+                                      Read ( MaFile, MaMember );
+                                      RArray[R] := Rg;
+                                      TArray[R] := MaMember.Texto;
+                                      F := 'N';
+                                    end
+                                    else F := 'P';
+                               end;
+                         'P' : begin
+                                 N := 0;
+                                 Repeat
+                                   R := 19;
+                                   For L := 1 to 19
+                                   do If TArray[L] <> '' then R  := L;
+                                   If RArray[R] < IAddress^.RelMax then
+                                      begin
+                                        Rg := RArray[R];
+                                        For L := 2 to 19 do
+                                        begin
+                                          RArray[L - 1] := RArray[L];
+                                          TArray[L - 1] := TArray[L];
+                                        end;
+                                        Rg := Rg + 1;
+                                        Seek ( MaFile, Rg       );
+                                        Read ( MaFile, MaMember );
+                                        RArray[R] := Rg;
+                                        TArray[R] := MaMember.Texto;
+                                        N := N + 1;
+                                        F := 'N';
+                                      end
+                                      else F := 'P';
+                                 Until (N         = 19              ) or
+                                       (RArray[R] = IAddress^.RelMax);
+                               end;
+                    end;
+                  end;
+    end;
+    If F <> 'N' then
+       begin
+         Color(Red,White);
+         GotoXY(2,24);  Write('Fim do Cap¡tulo.');
+       end;
+  Until Cont = #27;
+  Move(ScArrayM[1],MemW[$B800:0000],4000);
+  Color(Tfn,Utx);
+end;
+
+
+Procedure ScrollIndice;
+Var
+   Cont,Direcao,
+   F,Tkb          : Char;
+   Sx,N,R,L       : Integer;
+   KArray         : Array[1..7]    of Str2;
+   NArray         : Array[1..7]    of Str50;
+   ScArrayI       : Array[1..4000] of Char;
+
+begin
+  Move(MemW[$B800:0000],ScArrayI[1],4000);
+  Color(Blue,White);
+  GotoXY(01,23); Write(ConstStr(' ',80));
+  GotoXY(04,23); Write(#25);
+  GotoXY(06,23); Write('PgDn');
+  GotoXY(21,23); Write(#24);
+  GotoXY(23,23); Write('PgUp');
+  GotoXY(39,23); Write('Esc');
+  GotoXY(49,23); Write('Enter');
+  GotoXY(67,23); Write('F5');
+  Color(Blue,Cyan);
+  GotoXY(05,23); Write('/');
+  GotoXY(10,23); Write(#26,'Pr¢xima');
+  GotoXY(22,23); Write('/');
+  GotoXY(27,23); Write(#26,'Anterior');
+  GotoXY(42,23); Write(#26,'Fim');
+  GotoXY(54,23); Write(#26,'Seleciona');
+  GotoXY(69,23); Write(#26,'Imprime');
+  Color(Red,White);
+  LimpaLn(24,Red);
+  DrawBox(2,10,53,19,Sfn,'S');
+  Color(Bfn,Btx);
+  GotoXY(2,10); Write(' Nome do Cap¡tulo                                   ');
+  Color(Sfn,Stx);
+  Tkb     := 'L';
+  F       := 'N';
+  Direcao := 'P';
+  L       := 0;
+  Sx      := 1;
+  For I := 1 to 7 do begin
+                       KArray[I] := '';
+                       NArray[I] := '';
+                     end;
+
+  InNo := '';
+  Repeat
+    RC := 'N';
+    SearchPosI ( RootI );
+    If RC = 'S' then
+       begin
+         L := L + 1;
+         KArray[L] := InNo;
+         NArray[L] := IAddress^.Nome;
+       end
+       else L := 7;
+  Until L = 7;
+  Repeat
+    Window(2,12,54,19);
+    For I := 1 to 7 do begin
+                         If KArray[I] <> '' then
+                            begin
+                              If I = Sx then Color(Tfn,Utx)
+                                        else Color(Sfn,Stx);
+                              GotoXY(1,I);
+                              Writeln(' ',NArray[I],
+                                      ' ':51-Length(NArray[I]));
+                            end;
+                       end;
+    Window(1,1,80,25);
+    Cont := ReadKey;
+    If (Cont = #0 ) and
+       (KeyPressed) then
+       begin
+         Cont := ReadKey;
+         Case Cont of
+              #63 : begin
+                      QPorta;
+                      If TC = #13 then
+                         begin
+                           TestaImpressora('I','Manual do Usu rio');
+                           InNo := KArray[Sx];
+                           SearchTreeI ( RootI );
+                           I := IAddress^.RelMin - 1;
+                           L := 100;
+                           Repeat
+                             I := I + 1;
+                             Seek ( MaFile, I        );
+                             Read ( MaFile, MaMember );
+                             If L > 58 then
+                                begin
+                                  If L <> 100 then WriteLine('W',Qp);
+                                  WriteLine('L',ConstStr(' ',5)+#27+Dx+
+                                                Acentua('Manual do Usu rio')+
+                                                ConstStr(' ',2)+XSystem+#27+Df);
+                                  WriteLine('L',ConstStr(' ',5)+ConstStr('-',75));
+                                  WriteLine('L',ConstStr(' ',5)+KArray[Sx]+' '+
+                                                Nx+Acentua(NArray[Sx])+Nf);
+                                  WriteLine('L',ConstStr(' ',5)+ConstStr('-',75));
+                                  WriteLine('L',' ');
+                                  L := 5;
+                                end;
+                             L := L + 1;
+                             WriteLine('L',ConstStr(' ',10)+Acentua(MaMember.Texto));
+                             If KeyPressed then
+                                begin
+                                  TC := ReadKey;
+                                  If TC = #13 then
+                                     Repeat
+                                       TC := ReadKey;
+                                     Until (TC = #13) or (TC = #27);
+                                end;
+                           Until (I = IAddress^.RelMax) or (TC = #27);
+                           If L <> 0 then WriteLine('W',Qp);
+                           Close ( LST );
+                         end;
+                      LimpaLn(24,Red);
+                      TC      := #00;
+                      Direcao := 'N';
+                    end;
+              #72 : begin
+                      Tkb     := 'L';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(23,23); Write('PgUp');
+                      Color(Blue,(White + Blink));
+                      GotoXY(21,23); Write(#24);
+                    end;
+              #73 : begin
+                      Tkb     := 'P';
+                      Direcao := 'A';
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(21,23); Write(#24);
+                      Color(Blue,(White + Blink));
+                      GotoXY(23,23); Write('PgUp');
+                    end;
+              #80 : begin
+                      Tkb     := 'L';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(04,23); Write(#25);
+                      Color(Blue,White);
+                      GotoXY(06,23); Write('PgDn');
+                      GotoXY(21,23); Write(#24);
+                      GotoXY(23,23); Write('PgUp');
+                    end;
+              #81 : begin
+                      Tkb     := 'P';
+                      Direcao := 'P';
+                      Color(Blue,(White + Blink));
+                      GotoXY(06,23); Write('PgDn');
+                      Color(Blue,White);
+                      GotoXY(04,23); Write(#25);
+                      GotoXY(21,23); Write(#24);
+                      GotoXY(23,23); Write('PgUp');
+                    end;
+              else Direcao := ' ';
+         end;
+       end
+       else If Cont = #13 then
+               begin
+                 InNo := KArray[Sx];
+                 SearchTreeI ( RootI );
+                 ScrollManual;
+                 Direcao := 'N';
+               end
+               else If Cont = #27 then Direcao := 'N';
+    LimpaLn(24,Red);
+    N := 7;
+    Case Direcao of
+         'A' : If F <> 'A' then
+                  begin
+                    Case Tkb of
+                         'L' : If Sx > 1
+                                  then begin
+                                         Sx := Sx - 1;
+                                         F  := 'N';
+                                       end
+                                  else begin
+                                         RC   := 'N';
+                                         InNo := KArray[1];
+                                         SearchAntI ( RootI );
+                                         If RC = 'S' then
+                                            begin
+                                              For I := 7 downto 2 do
+                                              begin
+                                                KArray[I] := KArray[I - 1];
+                                                NArray[I] := NArray[I - 1];
+                                              end;
+                                              KArray[1] := InNo;
+                                              NArray[1] := IAddress^.Nome;
+                                              F := 'N';
+                                            end
+                                            else F := 'A';
+                                       end;
+                         'P' : begin
+                                 N  := 0;
+                                 Sx := 1;
+                                 Repeat
+                                   N    := N + 1;
+                                   RC   := 'N';
+                                   InNo := KArray[1];
+                                   SearchAntI ( RootI );
+                                   If RC = 'S' then
+                                      begin
+                                        For I := 7 downto 2 do
+                                        begin
+                                          KArray[I] := KArray[I - 1];
+                                          NArray[I] := NArray[I - 1];
+                                        end;
+                                        KArray[1] := InNo;
+                                        NArray[1] := IAddress^.Nome;
+                                        F := 'N';
+                                      end
+                                      else F := 'A';
+                                 Until (N = 7) or (RC = 'N');
+                               end;
+                    end;
+                  end;
+         'P' : If F <> 'P' then
+                  begin
+                    Case Tkb of
+                         'L' : If Sx < 7 then
+                                  begin
+                                    If KArray[Sx + 1] <> '' then
+                                       begin
+                                         Sx := Sx + 1;
+                                         F  := 'N';
+                                       end
+                                       else F := 'P';
+                                  end
+                                  else begin
+                                         RC   := 'N';
+                                         InNo := KArray[Sx];
+                                         SearchPosI ( RootI );
+                                         If RC = 'S' then
+                                            begin
+                                              For I := 2 to 7 do
+                                              begin
+                                                KArray[I - 1] := KArray[I];
+                                                NArray[I - 1] := NArray[I];
+                                              end;
+                                              KArray[7] := InNo;
+                                              NArray[7] := IAddress^.Nome;
+                                              F := 'N';
+                                            end
+                                            else F := 'P';
+                                       end;
+                         'P' : begin
+                                 N  := 0;
+                                 Sx := 1;
+                                 Repeat
+                                   N := N + 1;
+                                   R := 7;
+                                   For L := 1 to 7
+                                   do If KArray[L] <> '' then R := L;
+                                   RC   := 'N';
+                                   InNo := KArray[R];
+                                   SearchPosI ( RootI );
+                                   If RC = 'S' then
+                                      begin
+                                        For I := 2 to 7 do
+                                        begin
+                                          KArray[I - 1] := KArray[I];
+                                          NArray[I - 1] := NArray[I];
+                                        end;
+                                        KArray[R] := InNo;
+                                        NArray[R] := IAddress^.Nome;
+                                      end;
+                                 Until (N = 7) or (RC = 'N');
+                                 F := 'N';
+                               end;
+                    end;
+                  end;
+    end;
+    If (F <> 'N') or (N < 7) then
+       begin
+         L := WhereY;
+         Color(Red,White);
+         GotoXY(1,24);  Write(ConstStr(' ',80));
+         GotoXY(1,24);  Write(' Fim da Lista');
+         Color(Sfn,Stx);
+       end;
+  Until Cont = #27;
+  Move(ScArrayI[1],MemW[$B800:0000],4000);
+  Color(Tfn,Utx);
+end;
+
+
+Procedure HelpManual;
+begin
+  Assign ( InFile, (XDrive + '\' + XSystem[1] + 'LOGMANL.IDX'));
+  {$I-}
+  Reset ( InFile );
+  {$I+}
+  If IOResult = 0 then begin
+                         Assign ( MaFile, (XDrive + '\' + XSystem[1] + 'LOGMANL.DAT'));
+                         {$I-}
+                         Reset ( MaFile );
+                         {$I+}
+                         If IOResult = 0 then
+                            begin
+                              If OpMn = 'N' then
+                                 begin
+                                   LimpaLn(24,Red);
+                                   Color(Red,LightGray);
+                                   GotoXY(2,24);
+                                   Write('Aguarde, estou carregando o Manual do Usu rio');
+                                   LoadManual;
+                                   LimpaLn(24,Tfd);
+                                 end;
+                            end
+                            else OpMn := 'X';
+                       end
+                       else OpMn := 'X';
+  Case OpMn of
+       'S' : begin
+               ScrollIndice;
+               Close ( InFile );
+               Close ( MaFile );
+             end;
+       'X' : begin
+               Color(Blue,Cyan);
+               GotoXY(1,23); Write(ConstStr(' ',80));
+               GotoXY(2,23); Write('Os arquivos do Manual do Usu rio n„o foram encontrados');
+               TeclaReturn;
+               LimpaLn(23,Tfd);
+             end;
+  end;
+end;

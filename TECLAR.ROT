@@ -1,0 +1,18 @@
+Procedure TeclaReturn;
+begin
+  Color(Red,Cyan);
+  GotoXY(01,24);  Write(ConstStr(' ',80));
+  GotoXY(66,24);  Write('Tecle <     > ');
+  Color(Red,White);
+  GotoXY(73,24); Write('Enter');
+  ProcNo := Limite;
+  Repeat
+    TC := ReadKey;
+  Until TC = #13;
+  Color(Tfd,Utx);
+  GotoXY(1,24); ClrEol;
+  Color(Tfn,Utx);
+end;
+
+
+

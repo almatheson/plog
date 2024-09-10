@@ -1,0 +1,12 @@
+Function LimpaChave(S : Str80) : Str80;
+Var
+  P     : Integer;
+  F     : Str80;
+begin
+  F := '';
+  If Length(S) > 0 then
+     For P := 1 to Length(S)
+     do If (S[P] >= #48) and (S[P] <= #57) then F := F + S[P];
+  LimpaChave := F;
+end;
+

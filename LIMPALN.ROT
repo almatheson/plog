@@ -1,0 +1,6 @@
+Procedure Limpaln(L : Integer; C : Byte);
+begin
+  Color(C,Utx);
+  GotoXY(1,L); ClrEol;
+  Color(Tfn,Utx);
+end;

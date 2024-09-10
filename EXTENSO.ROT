@@ -1,0 +1,246 @@
+Procedure StrValor(MM : Str3);
+Var
+    B1,B2,B3          : Char;
+    X1,X2,X3,XX,T,E   : Integer;
+    Unidade           : Array[1..20] of String[9];
+    Dezena            : Array[1..9]  of String[9];
+    Centena           : Array[1..9]  of String[12];
+
+begin
+  Unidade[1]  := 'UM';
+  Unidade[2]  := 'DOIS';
+  Unidade[3]  := 'TRES';
+  Unidade[4]  := 'QUATRO';
+  Unidade[5]  := 'CINCO';
+  Unidade[6]  := 'SEIS';
+  Unidade[7]  := 'SETE';
+  Unidade[8]  := 'OITO';
+  Unidade[9]  := 'NOVE';
+  Unidade[10] := 'DEZ';
+  Unidade[11] := 'ONZE';
+  Unidade[12] := 'DOZE';
+  Unidade[13] := 'TREZE';
+  Unidade[14] := 'QUATORZE';
+  Unidade[15] := 'QUINZE';
+  Unidade[16] := 'DEZESSEIS';
+  Unidade[17] := 'DEZESSETE';
+  Unidade[18] := 'DEZOITO';
+  Unidade[19] := 'DEZENOVE';
+  Unidade[20] := 'VINTE';
+
+  Dezena[1]   := 'DEZ';
+  Dezena[2]   := 'VINTE';
+  Dezena[3]   := 'TRINTA';
+  Dezena[4]   := 'QUARENTA';
+  Dezena[5]   := 'CINQUENTA';
+  Dezena[6]   := 'SESSENTA';
+  Dezena[7]   := 'SETENTA';
+  Dezena[8]   := 'OITENTA';
+  Dezena[9]   := 'NOVENTA';
+
+  Centena[1]  := 'CENTO';
+  Centena[2]  := 'DUZENTOS';
+  Centena[3]  := 'TREZENTOS';
+  Centena[4]  := 'QUATROCENTOS';
+  Centena[5]  := 'QUINHENTOS';
+  Centena[6]  := 'SEISCENTOS';
+  Centena[7]  := 'SETECENTOS';
+  Centena[8]  := 'OITOCENTOS';
+  Centena[9]  := 'NOVECENTOS';
+  B1 := MM[1];
+  B2 := MM[2];
+  B3 := MM[3];
+
+  Val(B1,X1,E);
+  Val(B2,X2,E);
+  Val(B3,X3,E);
+  Val(MM,XX,E);
+
+  If Res <> '' then Res := Res + ' ';
+
+  If XX < 21
+     then Res := Res + Unidade[XX]
+     else If XX = 100
+             then Res := Res + 'CEM'
+             else begin
+                    If X1 > 0 then
+                       begin
+                         Res := Res + Centena[X1];
+                         If X2 = 1
+                            then Res := Res + ' E ' + Unidade[(X2*10)+X3]
+                            else begin
+                                   If X2 > 0
+                                      then Res := Res + ' E ' + Dezena[X2];
+                                   If X3 > 0
+                                      then Res := Res + ' E ' + Unidade[X3];
+                                 end;
+                       end
+                       else If X2 = 1
+                               then Res := Res + Unidade[(X2*10)+X3]
+                               else begin
+                                      If X2 > 0
+                                         then Res := Res + Dezena[X2];
+                                      If X3 > 0
+                                         then Res := Res + ' E ' + Unidade[X3];
+                                    end;
+                  end;
+end;
+
+
+
+Procedure Extenso(Tm1,Tm2,Tm3 : Integer; VStr : Str80  );
+Var
+    Centavo,Dezena,Milhar,Milhao,Trilhao : String[3];
+    I,E,T,C1,D1,K1,M1,T1                 : Integer;
+
+begin
+  Centavo := '';
+  Dezena  := '';
+  Milhar  := '';
+  Milhao  := '';
+  Trilhao := '';
+
+  C1   := 0;
+  D1   := 0;
+  K1   := 0;
+  M1   := 0;
+  T1   := 0;
+
+  Res  := '';
+  Res1 := '';
+  Res2 := '';
+  Res3 := '';
+
+  Centavo   := '0' + Copy(VStr,(Length(VStr) - 1),2);
+  VStr      := Copy(VStr,1,(Length(VStr) - 3));
+  T         := Length(VStr);
+
+  If T > 0 then
+     begin
+       Case T of
+           1..3 : Dezena := Copy(VStr,1,T);
+           else begin
+                  I      := T - 2;
+                  Dezena := Copy(VStr,I,3);
+                  T      := Length(VStr);
+                  If T > 4 then
+                     begin
+		       VStr := Copy(VStr,1,(T - 4));
+		       T    := Length(VStr);
+                       Case T of
+                         1..3 : Milhar := Copy(VStr,1,T);
+                         else begin
+                                I      := T - 2;
+                                Milhar := Copy(VStr,I,3);
+                                T      := Length(VStr);
+                                If T > 4 then
+                                   begin
+				     VStr := Copy(VStr,1,(T - 4));
+				     T    := Length(VStr);
+                                     Case T of
+                                       1..3 : Milhao := Copy(VStr,1,T);
+                                       else begin
+                                              I      := T - 2;
+                                              Milhao := Copy(VStr,I,3);
+                                              T      := Length(VStr);
+                                              If T > 4 then
+                                                 begin
+						   VStr    := Copy(VStr,1,(T - 4));
+						   T       := Length(VStr);
+						   Trilhao := Copy(VStr,1,T);
+                                                 end;
+                                            end;
+                                     end;
+                                   end;
+                              end;
+                       end;
+                     end;
+                end;
+       end;
+     end;
+
+  Val(Trilhao,T1,E);
+  Val(Milhao,M1,E);
+  Val(Milhar,K1,E);
+  Val(Dezena,D1,E);
+  Val(Centavo,C1,E);
+  If T1 > 0 then
+     begin
+       T := Length(Trilhao);
+       Case T of
+           1 : Trilhao := '00' + Copy(Trilhao,1,1);
+           2 : Trilhao := '0'  + Copy(Trilhao,1,2);
+       end;
+       StrValor(Trilhao);
+       If T1 = 1 then Res := Res + ' TRILHAO'
+                 else Res := Res + ' TRILHOES';
+       If (M1 = 0) and (K1 = 0) and (D1 = 0) then Res := Res + ' DE REAIS';
+     end;
+
+  If M1 > 0 then
+     begin
+       T := Length(Milhao);
+       Case T of
+         1 : Milhao := '00' + Copy(Milhao,1,1);
+         2 : Milhao := '0'  + Copy(Milhao,1,2);
+       end;
+       If T1 > 0 then Res := Res + ' E';
+       StrValor(Milhao);
+       If M1 = 1 then Res := Res + ' MILHAO'
+                 else Res := Res + ' MILHOES';
+       If (K1 = 0) and (D1 = 0) then Res := Res + ' DE REAIS';
+     end;
+
+  If K1 > 0 then
+     begin
+       T := Length(Milhar);
+       Case T of
+           1 : Milhar := '00' + Copy(Milhar,1,1);
+           2 : Milhar := '0'  + Copy(Milhar,1,2);
+       end;
+       If (T1 > 0) or (M1 > 0) then Res := Res + ' E';
+       StrValor(Milhar);
+       Res := Res + ' MIL';
+       If D1 = 0 then Res := Res + ' REAIS';
+     end;
+
+  If D1 > 0 then
+     begin
+       T := Length(Dezena);
+       Case T of
+           1 : Dezena := '00' + Copy(Dezena,1,1);
+           2 : Dezena := '0'  + Copy(Dezena,1,2);
+       end;
+       If (T1 > 0 ) or (M1 > 0) or (K1 > 0) then Res := Res + ' E';
+       StrValor(Dezena);
+       If (T1 = 0 ) and (M1 = 0) and (K1 = 0) and (D1 = 1)
+          then Res := Res + ' REAL'
+          else Res := Res + ' REAIS';
+     end;
+
+  If C1 > 0 then
+     begin
+       T := Length(Centavo);
+       Case T of
+           1 : Centavo := '00' + Copy(Centavo,1,1);
+           2 : Centavo := '0'  + Copy(Centavo,1,2);
+       end;
+       If (T1 > 0) or (M1 > 0) or (K1 > 0) or (D1 > 0) then Res := Res + ' E';
+       StrValor(Centavo);
+       If C1 = 1 then Res := Res + ' CENTAVO'
+                 else Res := Res + ' CENTAVOS';
+     end;
+
+  Res1 := Copy(Res,1,Tm1);
+  Res2 := Copy(Res,(Tm1 + 1),Tm2);
+  Res3 := Copy(Res,(Tm1 + Tm2 + 1),Tm3);
+
+  If Copy(Res2,1,1) = ' ' then Res2 := Copy(Res2,2,Length(Res2));
+  If Copy(Res3,1,1) = ' ' then Res3 := Copy(Res3,2,Length(Res3));
+
+  If Length(Res1) < Tm1 then Res1 := Res1 + ConstStr('*',(Tm1 - Length(Res1)));
+
+  If Length(Res2) < Tm2 then Res2 := Res2 + ConstStr('*',(Tm2 - Length(Res2)));
+
+  If Length(Res3) < Tm3 then Res3 := Res3 + ConstStr('*',(Tm3 - Length(Res3)));
+end;
