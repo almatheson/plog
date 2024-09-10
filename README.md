@@ -12,7 +12,6 @@ Dateien des Lohn- und Buchhaltungssystems, die von Charles Bruce Matheson in Bor
 
 File di sistema di paga e contabilità sviluppati da Charles Bruce Matheson in linguaggio Borland Pascal negli anni '80 e con gli ultimi aggiornamenti intorno al 2005. Seguono i commenti originali dell'autore:
 
-
            (*****************************************)
            (*         Charles Bruce Matheson        *)
            (*                                       *)
