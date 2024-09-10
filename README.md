@@ -34,3 +34,12 @@ File di sistema di paga e contabilità sviluppati da Charles Bruce Matheson in l
        (*            Contabilidade              *)
        (*                                       *)
        (*****************************************)
+
+       Foi disponibilizado para fins de pesquisa e objetos de estudo.
+       It has been made available for research and study purposes.
+       Se ha puesto a disposición para fines de investigación y estudio."
+       Il a été mis à disposition à des fins de recherche et d'étude."
+       Es wurde für Forschungs- und Studienzwecke zur Verfügung gestellt."
+       È stato reso disponibile per scopi di ricerca e studio."
+
+       Allan Matheson
