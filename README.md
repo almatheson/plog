@@ -18,7 +18,7 @@ File di sistema di paga e contabilità sviluppati da Charles Bruce Matheson in l
            (*                                       *)
            (*          Copyright,1989-2000          *)
            (*                                       *)
-	         (*           VersÆo 9.4  03/1996         *)
+	   (*           VersÆo 9.4  03/1996         *)
            (*                  9.5  09/1999         *)
            (*                                       *)
            (*           Folha de Pagamento          *)
